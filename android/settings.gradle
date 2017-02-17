@@ -1,0 +1,3 @@
+rootProject.name = 'RocketTestApp'
+
+include ':app'
