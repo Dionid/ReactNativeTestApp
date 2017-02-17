@@ -9,11 +9,16 @@ import {
     StyleSheet
 } from 'react-native';
 
+
 export default class CardPr extends Component{
 
     shouldComponentUpdate(nextProps, nextState) {
         // return this.props.currentOffset !== nextProps.currentOffset;
         return false;
+    }
+
+    calculateRotateX(){
+
     }
 
     calculateOpacity(currentOffset){
@@ -22,10 +27,6 @@ export default class CardPr extends Component{
         } else {
             return (this.props.initialOffset === 0 ? 90 : this.props.initialOffset) / currentOffset;
         }
-    }
-
-    calculateRotateX(){
-
     }
 
     calculateTranslateY(currentOffset){
@@ -48,14 +49,14 @@ export default class CardPr extends Component{
             Animated.timing(
                 this.opacityValue,
                 {
-                    duration:1,
+                    duration:180,
                     toValue: this.calculateOpacity(currentOffset)
                 }
             ),
             Animated.timing(
                 this.translateYValue,
                 {
-                    duration:1,
+                    duration:180,
                     toValue: this.calculateTranslateY(currentOffset)
                 }
             )

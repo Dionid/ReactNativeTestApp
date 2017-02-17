@@ -6,6 +6,5 @@
 
 import {AppRegistry} from 'react-native';
 import RocketTestApp from "./app/app";
-// import RocketTestApp from "../"
 
 AppRegistry.registerComponent('RocketTestApp', () => RocketTestApp);

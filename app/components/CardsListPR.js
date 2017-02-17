@@ -18,57 +18,16 @@ import {
 import CardPr from "./CardPr";
 import HistoryComponent from "./HistoryComponent";
 
-const screenWidth = Dimensions.get('window').width,
-    screenHeight = Dimensions.get('window').height - 60,
-    initialHeight = 200;
+const {width: screenWidth,height: screenHeight} = Dimensions.get('window');
+
+var AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
 export default class CardsListPR extends Component {
-
-    // state={
-    //     containerHeight: new Animated.Value(initialHeight)
-    // };
-
-    // handleScroll = (event)=>{
-    //
-    //     const curOffset = event.nativeEvent.contentOffset.y,
-    //         directionUp = curOffset > this.lastOffset ? 0 : 1;
-    //
-    //     let value = 0;
-    //
-    //     if(directionUp){
-    //         value = initialHeight + curOffset
-    //     } else {
-    //         value = initialHeight - (curOffset - this.lastAdded)
-    //     }
-    //
-    //     // value *= 1.1;
-    //
-    //     // value = value * 1.2;
-    //
-    //     // console.log(value, value * 0.9);
-    //
-    //     this.lastAdded = curOffset;
-    //     this.lastOffset = curOffset;
-    //
-    //
-    //     if(curOffset > (this.innerHeight-initialHeight-50) || value < initialHeight || value >= screenHeight || curOffset < 1){
-    //         return;
-    //     }
-    //
-    //     Animated
-    //         .spring(
-    //             this.containerHeight,
-    //             {
-    //             ...this.SPRING_CONFIG,
-    //             toValue: value
-    //             }
-    //         )
-    //         .start();
-    // };
 
     static defaultProps = {
         cardsNumber: 5,
         initialOffset: 180*4,
+        initialOffsetArr: [0,180,360,540,720],
         cards: [
             {
                 id: 0
@@ -90,26 +49,85 @@ export default class CardsListPR extends Component {
         currentOffset: 180*4
     };
 
-    getStyle = ()=>{
-        return styles.cardsContainer
-    };
 
     handleScroll = (event)=>{
 
         const currentOffset = event.nativeEvent.contentOffset.y;
 
-        if(currentOffset > this.props.initialOffset){
+        if(currentOffset >= this.props.initialOffset){
             return;
         }
 
-        this.setState({
-            currentOffset
-        })
+        this.props.initialOffsetArr.forEach((offset,i)=>{
+            this.animate(currentOffset,offset,i);
+        });
     };
+
+    calculateOpacity(currentOffset,offset){
+        if(currentOffset <= offset){
+            return 1;
+        } else {
+            return (offset === 0 ? 90 : offset) / currentOffset;
+        }
+    }
+
+    calculateTranslateY(currentOffset,offset){
+        let value = 0;
+
+        if(currentOffset >= offset){
+            value = currentOffset - offset;
+        }
+
+        return value;
+    }
+
+    animate(currentOffset,offset,i){
+        console.log('asd')
+        Animated.parallel([
+            Animated.timing(
+                this.opacityValue[i],
+                {
+                    duration:100,
+                    easing:  Easing.cubic,
+                    toValue: this.calculateOpacity(currentOffset,offset)
+                }
+            ),
+            Animated.timing(
+                this.translateYValue[i],
+                {
+                    duration:100,
+                    easing:  Easing.cubic,
+                    toValue: this.calculateTranslateY(currentOffset,offset)
+                }
+            )
+        ]).start();
+    }
+
+    opacityValue = this.props.cards.map(card=>{
+        return new Animated.Value(0);
+    });
+
+    translateYValue = this.props.cards.map(card=>{
+        return new Animated.Value(0);
+    });
+
+    getCardStyle(i){
+        return [
+            styles.card,
+            {
+                opacity: this.opacityValue[i],
+                transform:[
+                    {
+                        translateY: this.translateYValue[i]
+                    }
+                ]
+            }
+        ]
+    }
 
     render() {
         return (
-            <View style={this.getStyle()}>
+            <View style={styles.cardsContainer}>
                 <ScrollView
                     ref="scroll"
                     showsVerticalScrollIndicator={false}
@@ -121,11 +139,11 @@ export default class CardsListPR extends Component {
                 >
                     {
                         this.props.cards.map((card,i)=>{
-                            return <CardPr
-                                active={i === 0}
-                                currentOffset={this.state.currentOffset}
-                                initialOffset={this.cardHeight*i}
-                                key={card.id}/>
+                            return (
+                                <Animated.View key={card.id} style={this.getCardStyle(i)}>
+
+                                </Animated.View>
+                            )
                         })
                     }
                     <HistoryComponent/>
@@ -138,6 +156,19 @@ export default class CardsListPR extends Component {
 const styles = StyleSheet.create({
     cardsContainer: {
         height: screenHeight,
-        marginBottom: 60,
+        marginBottom: 60
+    },
+    card: {
+        height: 180,
+        alignSelf: 'stretch',
+        marginHorizontal: 30,
+        backgroundColor: '#000',
+        borderRadius: 10,
+        marginBottom: 15,
+        transform: [
+            { perspective: 1000 }
+            // { translateY: Dimensions.get('window').width * 0.24 },
+            // { rotateX: '-60deg'},
+        ]
     }
 });
