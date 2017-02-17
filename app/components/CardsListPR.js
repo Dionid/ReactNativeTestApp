@@ -24,17 +24,9 @@ const screenWidth = Dimensions.get('window').width,
 
 export default class CardsListPR extends Component {
 
-    containerHeight = new Animated.Value(initialHeight);
-    SPRING_CONFIG = {tension: 2, friction: 3};
-    lastOffset = 0;
-    innerHeight = 0;
-
     // state={
     //     containerHeight: new Animated.Value(initialHeight)
     // };
-
-    lastAdded = 0;
-
 
     // handleScroll = (event)=>{
     //
@@ -74,32 +66,73 @@ export default class CardsListPR extends Component {
     //         .start();
     // };
 
+    static defaultProps = {
+        cardsNumber: 5,
+        initialOffset: 180*4,
+        cards: [
+            {
+                id: 0
+            },{
+                id: 1
+            },{
+                id: 2
+            },{
+                id: 3
+            },{
+                id: 4
+            }
+        ]
+    };
+
+    cardHeight = 180;
+
+    state = {
+        currentOffset: 180*4
+    };
+
     getStyle = ()=>{
         return [
             styles.cardsContainer
         ]
     };
 
+    handleScroll = (event)=>{
+
+        const currentOffset = event.nativeEvent.contentOffset.y;
+
+        if(currentOffset > this.props.initialOffset){
+            return;
+        }
+
+        this.setState({
+            currentOffset
+        })
+    };
+
     render() {
         return (
-            <Animated.View style={this.getStyle()}>
+            <View style={this.getStyle()}>
                 <ScrollView
                     ref="scroll"
+                    showsVerticalScrollIndicator={false}
                     scrollEventThrottle={16}
                     onScroll={this.handleScroll}
                     onContentSizeChange={(width,height) => {
-                        this.refs.scroll.scrollToEnd({animated: false});
-                        this.innerHeight = height;
+                        this.refs.scroll.scrollTo({x: 0, y: this.props.initialOffset, animated: false});
                     }}
                 >
-                    <CardPr active={true} />
-                    <CardPr/>
-                    <CardPr/>
-                    <CardPr/>
-                    <CardPr/>
+                    {
+                        this.props.cards.map((card,i)=>{
+                            return <CardPr 
+                                active={i === 0} 
+                                currentOffset={this.state.currentOffset} 
+                                initialOffset={this.cardHeight*i}
+                                key={card.id}/>
+                        })
+                    }
                     <HistoryComponent/>
                 </ScrollView>
-            </Animated.View>
+            </View>
         );
     }
 }
@@ -108,6 +141,7 @@ const styles = StyleSheet.create({
     cardsContainer: {
         height: screenHeight,
         marginBottom: 15,
-        overflow: 'hidden'
+        overflow: 'hidden',
+        paddingBottom: 60
     }
 });

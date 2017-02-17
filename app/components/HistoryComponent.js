@@ -2,7 +2,7 @@
  * Created by dionid on 17.02.17.
  */
 
-import React from 'react';
+import React, {Component} from 'react';
 import {
     AppRegistry,
     StyleSheet,
@@ -13,96 +13,173 @@ import {
     Image
 } from 'react-native';
 
-export default function HistoryComponent(){
-    const {
-        historyContainer,
-        historyRow,
-        historyRow__Inner,
-        history__dayName,
-        history__daySum,
-        history__image,
-        history__title_container,
-        history__title,
-        history__sum
-    } = styles;
+export default class HistoryComponent extends Component{
 
-    const historyRow__Day = [historyRow,styles.historyRow__Day];
+    shouldComponentUpdate(nextProps, nextState) {
+        return false;
+    }
+
+    render(){
+        const {
+            historyContainer,
+            historyRow,
+            historyRow__Inner,
+            history__dayName,
+            history__daySum,
+            history__image,
+            history__title_container,
+            history__title,
+            history__sum
+        } = styles;
+        
+        const historyRow__Day = [historyRow,styles.historyRow__Day];
 
 
-    return (
-        <View style={historyContainer}>
-            <View style={historyRow__Day}>
-                <View style={historyRow__Inner}>
-                    <Text style={history__dayName}>
-                        Сегодня
-                    </Text>
-                    <Text style={history__daySum}>
-                        -5800 Р
-                    </Text>
-                </View>
-            </View>
-            <View style={historyRow}>
-                <View style={historyRow__Inner}>
-                    <Image
-                        style={history__image}
-                        source={{uri:'https://www.billa.at/WNBinaryWeb/120/4514406.png'}}
-                    />
-                    <View
-                        style={history__title_container}
-                    >
-                        <Text style={history__title}>
-                            Billadas
+        return (
+            <View style={historyContainer}>
+                <View style={historyRow__Day}>
+                    <View style={historyRow__Inner}>
+                        <Text style={history__dayName}>
+                            Сегодня
+                        </Text>
+                        <Text style={history__daySum}>
+                            -5800 Р
                         </Text>
                     </View>
-                    <Text
-                        style={history__sum}
-                    >
-                        -1 200 Р
-                    </Text>
                 </View>
-            </View>
-            <View style={historyRow}>
-                <View style={historyRow__Inner}>
-                    <Image
-                        style={history__image}
-                        source={{uri:'https://www.billa.at/WNBinaryWeb/120/4514406.png'}}
-                    />
-                    <View
-                        style={history__title_container}
-                    >
-                        <Text style={history__title}>
-                            Billadas
+                <View style={historyRow}>
+                    <View style={historyRow__Inner}>
+                        <Image
+                            style={history__image}
+                            source={{uri:'https://www.billa.at/WNBinaryWeb/120/4514406.png'}}
+                        />
+                        <View
+                            style={history__title_container}
+                        >
+                            <Text style={history__title}>
+                                Billadas
+                            </Text>
+                        </View>
+                        <Text
+                            style={history__sum}
+                        >
+                            -1 200 Р
                         </Text>
                     </View>
-                    <Text
-                        style={history__sum}
-                    >
-                        -1 200 Р
-                    </Text>
                 </View>
-            </View>
-            <View style={historyRow}>
-                <View style={historyRow__Inner}>
-                    <Image
-                        style={history__image}
-                        source={{uri:'https://www.billa.at/WNBinaryWeb/120/4514406.png'}}
-                    />
-                    <View
-                        style={history__title_container}
-                    >
-                        <Text style={history__title}>
-                            Billadas
+                <View style={historyRow}>
+                    <View style={historyRow__Inner}>
+                        <Image
+                            style={history__image}
+                            source={{uri:'https://www.billa.at/WNBinaryWeb/120/4514406.png'}}
+                        />
+                        <View
+                            style={history__title_container}
+                        >
+                            <Text style={history__title}>
+                                Billadas
+                            </Text>
+                        </View>
+                        <Text
+                            style={history__sum}
+                        >
+                            -1 200 Р
                         </Text>
                     </View>
-                    <Text
-                        style={history__sum}
-                    >
-                        -1 200 Р
-                    </Text>
+                </View>
+                <View style={historyRow}>
+                    <View style={historyRow__Inner}>
+                        <Image
+                            style={history__image}
+                            source={{uri:'https://www.billa.at/WNBinaryWeb/120/4514406.png'}}
+                        />
+                        <View
+                            style={history__title_container}
+                        >
+                            <Text style={history__title}>
+                                Billadas
+                            </Text>
+                        </View>
+                        <Text
+                            style={history__sum}
+                        >
+                            -1 200 Р
+                        </Text>
+                    </View>
+                </View>
+                <View style={historyRow__Day}>
+                    <View style={historyRow__Inner}>
+                        <Text style={history__dayName}>
+                            Сегодня
+                        </Text>
+                        <Text style={history__daySum}>
+                            -5800 Р
+                        </Text>
+                    </View>
+                </View>
+                <View style={historyRow}>
+                    <View style={historyRow__Inner}>
+                        <Image
+                            style={history__image}
+                            source={{uri:'https://www.billa.at/WNBinaryWeb/120/4514406.png'}}
+                        />
+                        <View
+                            style={history__title_container}
+                        >
+                            <Text style={history__title}>
+                                Billadas
+                            </Text>
+                        </View>
+                        <Text
+                            style={history__sum}
+                        >
+                            -1 200 Р
+                        </Text>
+                    </View>
+                </View>
+                <View style={historyRow}>
+                    <View style={historyRow__Inner}>
+                        <Image
+                            style={history__image}
+                            source={{uri:'https://www.billa.at/WNBinaryWeb/120/4514406.png'}}
+                        />
+                        <View
+                            style={history__title_container}
+                        >
+                            <Text style={history__title}>
+                                Billadas
+                            </Text>
+                        </View>
+                        <Text
+                            style={history__sum}
+                        >
+                            -1 200 Р
+                        </Text>
+                    </View>
+                </View>
+                <View style={historyRow}>
+                    <View style={historyRow__Inner}>
+                        <Image
+                            style={history__image}
+                            source={{uri:'https://www.billa.at/WNBinaryWeb/120/4514406.png'}}
+                        />
+                        <View
+                            style={history__title_container}
+                        >
+                            <Text style={history__title}>
+                                Billadas
+                            </Text>
+                        </View>
+                        <Text
+                            style={history__sum}
+                        >
+                            -1 200 Р
+                        </Text>
+                    </View>
                 </View>
             </View>
-        </View>
-    );
+        );
+    }
 }
 
 const styles = StyleSheet.create({
