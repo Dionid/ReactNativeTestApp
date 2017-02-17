@@ -91,9 +91,7 @@ export default class CardsListPR extends Component {
     };
 
     getStyle = ()=>{
-        return [
-            styles.cardsContainer
-        ]
+        return styles.cardsContainer
     };
 
     handleScroll = (event)=>{
@@ -123,9 +121,9 @@ export default class CardsListPR extends Component {
                 >
                     {
                         this.props.cards.map((card,i)=>{
-                            return <CardPr 
-                                active={i === 0} 
-                                currentOffset={this.state.currentOffset} 
+                            return <CardPr
+                                active={i === 0}
+                                currentOffset={this.state.currentOffset}
                                 initialOffset={this.cardHeight*i}
                                 key={card.id}/>
                         })
@@ -140,8 +138,6 @@ export default class CardsListPR extends Component {
 const styles = StyleSheet.create({
     cardsContainer: {
         height: screenHeight,
-        marginBottom: 15,
-        overflow: 'hidden',
-        paddingBottom: 60
+        marginBottom: 60,
     }
 });

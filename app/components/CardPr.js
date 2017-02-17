@@ -5,20 +5,22 @@
 import React, { Component } from 'react';
 import {
     View,
+    Animated,
     StyleSheet
 } from 'react-native';
 
 export default class CardPr extends Component{
 
     shouldComponentUpdate(nextProps, nextState) {
-        return this.props.currentOffset !== nextProps.currentOffset;
+        // return this.props.currentOffset !== nextProps.currentOffset;
+        return false;
     }
 
-    calculateOpacity(){
-        if(this.props.currentOffset <= this.props.initialOffset){
+    calculateOpacity(currentOffset){
+        if(currentOffset <= this.props.initialOffset){
             return 1;
         } else {
-            return (this.props.initialOffset === 0 ? 90 : this.props.initialOffset) / this.props.currentOffset;
+            return (this.props.initialOffset === 0 ? 90 : this.props.initialOffset) / currentOffset;
         }
     }
 
@@ -26,40 +28,92 @@ export default class CardPr extends Component{
 
     }
 
-    calculateTranslateY(){
-        // return 500;
+    calculateTranslateY(currentOffset){
+        let value = 0;
 
-        if(this.props.currentOffset > this.props.initialOffset){
-            return this.props.currentOffset - this.props.initialOffset;
+        if(currentOffset >= this.props.initialOffset){
+            value = currentOffset - this.props.initialOffset;
+            console.log(value)
         }
 
-        return 0;
+        return value;
     }
 
-    render(){
-        let cardStyles = this.props.active ? [styles.card,{backgroundColor:'#CCC'}] : styles.card;
+    opacityValue = new Animated.Value(0);
+    translateYValue = new Animated.Value(0);
+    SPRING_CONFIG = {tension: 0, friction: 5};
 
-        const coef =  this.props.currentOffset / this.props.initialOffset,
-                opacity = this.calculateOpacity(),
-                translateY = this.calculateTranslateY();
-                // rotateX = this.calculateRotateX()
+    animate(currentOffset){
+        Animated.parallel([
+            Animated.timing(
+                this.opacityValue,
+                {
+                    duration:1,
+                    toValue: this.calculateOpacity(currentOffset)
+                }
+            ),
+            Animated.timing(
+                this.translateYValue,
+                {
+                    duration:1,
+                    toValue: this.calculateTranslateY(currentOffset)
+                }
+            )
+        ]).start();
+    }
 
-        cardStyles = [
-            cardStyles,
+    componentWillReceiveProps(nextProps){
+        const currentOffset = nextProps.currentOffset;
+        
+        if(currentOffset !== this.props.currentOffset){
+            this.animate(currentOffset);
+        }
+    }
+
+    componentDidMount(){
+        this.animate(this.props.currentOffset);
+    }
+
+    getStyles(){
+        // let cardStyles = this.props.active ? [styles.card,{backgroundColor:'#CCC'}] : styles.card;
+
+        return [
+            styles.card,
             {
-                opacity,
+                opacity: this.opacityValue,
                 transform:[
                     {
-                        translateY
+                        translateY: this.translateYValue
                     }
                 ]
             }
-        ];
-        
-        return(
-            <View style={cardStyles}>
+        ]
+    }
 
-            </View>
+    render(){
+        // let cardStyles = this.props.active ? [styles.card,{backgroundColor:'#CCC'}] : styles.card;
+        //
+        // const coef =  this.props.currentOffset / this.props.initialOffset,
+        //         opacity = this.calculateOpacity(),
+        //         translateY = this.calculateTranslateY();
+        //         // rotateX = this.calculateRotateX()
+        //
+        // cardStyles = [
+        //     cardStyles,
+        //     {
+        //         opacity,
+        //         transform:[
+        //             {
+        //                 translateY
+        //             }
+        //         ]
+        //     }
+        // ];
+
+        return(
+            <Animated.View style={this.getStyles()}>
+
+            </Animated.View>
         )
     }
 }

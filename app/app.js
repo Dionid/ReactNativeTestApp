@@ -36,6 +36,7 @@ export default class RocketTestApp extends Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        paddingBottom: 30,
         backgroundColor: '#FFFFFF'
     }
 });
