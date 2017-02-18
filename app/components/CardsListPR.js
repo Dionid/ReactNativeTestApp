@@ -92,7 +92,8 @@ export default class CardsListPR extends Component {
     state = {
         height: [0,5,15,30,45,cardWrHeight],
         opacity: [0,0.3,0.3,0.7,.9,1],
-        rotateX: [0,0,0,0,0,-15]
+        rotateX: [0,0,0,0,0,-15],
+        position: [0,0,5,20,50,95]
     };
 
     getStyle = ()=>{
@@ -131,6 +132,7 @@ export default class CardsListPR extends Component {
 
     lastYPos = 0;
     initialHeight = [0,5,15,30,45,cardWrHeight-20];
+    initialPosition = [0,0,5,20,50,95];
 
     _onStartShouldSetResponder = (e)=> {
         this.dragging = true;
@@ -151,23 +153,52 @@ export default class CardsListPR extends Component {
 
     sensetive = 3;
 
+    getElPosition = (index)=>{
+        return this.state.height.slice(0,index).reduce((sum,cur)=>{
+            return sum + cur
+        },0)
+    };
+
     handleScroll = (e)=>{
         const curPos = e.nativeEvent.pageY;
         const step = (this.lastYPos - curPos)*-1;
+        // const position = [...this.state.position];
         // const directionUp = step < 0;
+
+
 
         const height = this.state.height.map((num,i)=>{
             const val = num + step*(num+1/10)/100;
-            return val >= cardWrHeight-20 ? cardWrHeight-20 : this.initialHeight[i] > val ? this.initialHeight[i] : val;
+            const res = val >= cardWrHeight-20 ? cardWrHeight-20 : this.initialHeight[i] > val ? this.initialHeight[i] : val;
+            return res;
         });
 
-        // const opacity = height.forEach((num,i)=>{
-        //     return num / cardWrHeight-20;
+        // const opacity = height.map((num,i)=>{
+        //
+        //     console.log(num);
+        //
+        //     return num / (cardWrHeight-20);
         // });
+
+        // const opacity = this.state.opacity.map((num,i)=>{
+        //     const val = num + step*(num+1/10)/100;
+        //     return val;
+        // });
+
+
+        const rotateX = this.state.rotateX.map((num,i)=>{
+
+            const pos = this.getElPosition(i);
+
+            const res = pos/screenHeight*-80;
+
+            return res > 0 ? 0 : res;
+        });
+
 
         this.setState({
             height,
-            // opacity
+            rotateX
         });
 
         this.lastYPos = e.nativeEvent.pageY;
@@ -207,6 +238,7 @@ export default class CardsListPR extends Component {
 
 const styles = StyleSheet.create({
     cardsContainer: {
+        paddingTop: 20
     },
     cardWr:{
         height: cardWrHeight,
