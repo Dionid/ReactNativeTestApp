@@ -131,8 +131,9 @@ export default class CardsListPR extends Component {
     currentOffset = 0;
 
     lastYPos = 0;
-    initialHeight = [0,5,15,30,45,cardWrHeight-20];
+    initialHeight = [0,5,15,30,45,cardWrHeight-30];
     initialPosition = [0,0,5,20,50,95];
+    MAXIMAL_ROTATEX_VALUE = -70;
 
     _onStartShouldSetResponder = (e)=> {
         this.dragging = true;
@@ -151,13 +152,17 @@ export default class CardsListPR extends Component {
         return true;
     };
 
-    sensetive = 3;
-
     getElPosition = (index)=>{
-        return this.state.height.slice(0,index).reduce((sum,cur)=>{
+        return this.state.height.slice(1,index).reduce((sum,cur)=>{
             return sum + cur
-        },0)
+        },this.state.height[0])
     };
+
+    // componentDidMount(){
+    //
+    // }
+
+    sensetive = 40;
 
     handleScroll = (e)=>{
         const curPos = e.nativeEvent.pageY;
@@ -165,11 +170,9 @@ export default class CardsListPR extends Component {
         // const position = [...this.state.position];
         // const directionUp = step < 0;
 
-
-
         const height = this.state.height.map((num,i)=>{
             const val = num + step*(num+1/10)/100;
-            const res = val >= cardWrHeight-20 ? cardWrHeight-20 : this.initialHeight[i] > val ? this.initialHeight[i] : val;
+            const res = val >= cardWrHeight-30 ? cardWrHeight-30 : this.initialHeight[i] > val ? this.initialHeight[i] : val;
             return res;
         });
 
@@ -177,7 +180,7 @@ export default class CardsListPR extends Component {
         //
         //     console.log(num);
         //
-        //     return num / (cardWrHeight-20);
+        //     return num / (cardWrHeight-30);
         // });
 
         // const opacity = this.state.opacity.map((num,i)=>{
@@ -186,19 +189,42 @@ export default class CardsListPR extends Component {
         // });
 
 
-        const rotateX = this.state.rotateX.map((num,i)=>{
+        // const rotateX = this.state.rotateX.map((num,i)=>{
+        //
+        //     const pos = this.getElPosition(i);
+        //
+        //     const res = pos/screenHeight*this.MAXIMAL_ROTATEX_VALUE;
+        //
+        //     return res > 0 ? 0 : res;
+        // });
 
+
+        const resObj = {
+            height: [],
+            rotateX: [],
+            opacity: []
+        };
+
+        // console.log(step)
+
+        this.state.height.forEach((num,i)=>{
             const pos = this.getElPosition(i);
 
-            const res = pos/screenHeight*-80;
+            const heightValue = num + step*(this.sensetive/100);
 
-            return res > 0 ? 0 : res;
+            resObj.height.push(heightValue >= cardWrHeight-30 ? cardWrHeight-30 : this.initialHeight[i] > heightValue ? this.initialHeight[i] : heightValue);
+
+            resObj.rotateX.push(pos/screenHeight*this.MAXIMAL_ROTATEX_VALUE);
+
+            if(i===0) console.log(pos);
+
+            resObj.opacity.push(pos/screenHeight*7);
         });
 
 
         this.setState({
             height,
-            rotateX
+            ...resObj
         });
 
         this.lastYPos = e.nativeEvent.pageY;
