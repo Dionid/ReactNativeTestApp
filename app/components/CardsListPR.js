@@ -22,7 +22,7 @@ const screenWidth = Dimensions.get('window').width,
     screenHeight = Dimensions.get('window').height - 60,
     initialHeight = 200;
 
-export const cardWrHeight = 100;
+export const cardWrHeight = Math.floor((screenWidth-60)*0.62/2);
 
 export default class CardsListPR extends Component {
 
@@ -85,7 +85,7 @@ export default class CardsListPR extends Component {
         if(index === 0){
             return {
                 opacity: this.yOffset.interpolate({
-                    inputRange:[0,cardWrHeight*3],
+                    inputRange:[0,cardWrHeight*1.5],
                     outputRange:[1,0]
                 })
             }
@@ -95,7 +95,7 @@ export default class CardsListPR extends Component {
 
         return {
             opacity: this.yOffset.interpolate({
-                inputRange:[cardOffset,cardOffset*3],
+                inputRange:[cardOffset+cardWrHeight,cardOffset*(6/index)],
                 outputRange:[1,0]
             })
         }
@@ -104,27 +104,23 @@ export default class CardsListPR extends Component {
 
     calculateTranslateY = (index)=>{
 
-        // if(index === 0){
-        //     return {
-        //         transform:[
-        //             {
-        //                 translateY: this.yOffset.interpolate({
-        //                     inputRange:[0,cardWrHeight+20,this.props.initialOffset],
-        //                     outputRange:[10,cardWrHeight+19,this.props.initialOffset]
-        //                 })
-        //             }
-        //         ]
-        //     }
-        // }
+        const cardOffset = cardWrHeight*index || 0;
 
-        const cardOffset = cardWrHeight*index;
+        const initialNum = index === 0 ? 0 : cardWrHeight*index-(30*index);
 
         return {
             transform:[
+                { perspective: 1000 },
                 {
                     translateY: this.yOffset.interpolate({
-                        inputRange:[cardOffset-cardWrHeight,cardOffset,this.props.initialOffset],
-                        outputRange:[cardWrHeight,20,this.props.initialOffset - cardOffset]
+                        inputRange:[0,cardOffset,this.props.initialOffset],
+                        outputRange:[initialNum,20,this.props.initialOffset - cardOffset],
+                    })
+                },
+                {
+                    rotateX: this.yOffset.interpolate({
+                        inputRange: [-cardWrHeight, cardOffset, this.props.initialOffset],
+                        outputRange: ['-30deg','-10deg','0deg'],
                     })
                 }
             ]
@@ -140,14 +136,15 @@ export default class CardsListPR extends Component {
     };
 
     yOffset = new Animated.Value(0);
+    currentOffset = 0;
 
     onScroll = (event)=>{
 
-        const currentOffset = event.nativeEvent.contentOffset.y;
+        this.currentOffset = event.nativeEvent.contentOffset.y;
 
-        if(currentOffset > this.props.initialOffset){
-            return;
-        }
+        // if(this.currentOffset > this.props.initialOffset){
+        //     return;
+        // }
 
         return Animated.event([{ nativeEvent: { contentOffset: { y: this.yOffset } } }])(event)
     };
@@ -155,13 +152,12 @@ export default class CardsListPR extends Component {
     render() {
         return (
             <View style={this.getStyle()}>
-                <ScrollView
-                    ref="scroll"
+                <Animated.ScrollView
                     showsVerticalScrollIndicator={false}
                     scrollEventThrottle={16}
                     onScroll={this.onScroll}
                     contentOffset={{
-                        x: 0, y: this.props.initialOffset - 50
+                        x: 0, y: this.props.initialOffset - this.cardHeight*1.5
                     }}
                 >
                     {
@@ -176,7 +172,7 @@ export default class CardsListPR extends Component {
                         })
                     }
                     <HistoryComponent/>
-                </ScrollView>
+                </Animated.ScrollView>
             </View>
         );
     }
@@ -184,11 +180,11 @@ export default class CardsListPR extends Component {
 
 const styles = StyleSheet.create({
     cardsContainer: {
-        height: screenHeight,
+        // height: screenHeight,
         // marginTop: 15
     },
     cardWr:{
-        height: 100,
+        height: cardWrHeight,
         alignSelf: 'stretch',
         borderTopColor: 'green',
         borderTopWidth: 1,
@@ -199,20 +195,20 @@ const styles = StyleSheet.create({
         textAlign: 'center'
     },
     card: {
-        height: 200,
+        height: cardWrHeight*2,
         position: 'absolute',
         width: 320,
         marginHorizontal: 30,
-        top: 0,
-        left: 0,
+        // top: 0,
+        // left: 0,
         // backgroundColor: '#000',
         borderRadius: 10,
-        overflow: 'hidden',
-        transform: [
-            { perspective: 1000 },
+        // overflow: 'hidden',
+        // transform: [
+            // { perspective: 1000 },
             // { translateY: Dimensions.get('window').width * 0.24 },
             // { rotateX: '-60deg'},
-        ],
+        // ],
         borderColor: 'white',
         borderWidth: 1,
         // backgroundImage: require('../bg.png'),
