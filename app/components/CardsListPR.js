@@ -40,8 +40,8 @@ export default class CardsListPR extends Component {
     // };
 
     static defaultProps = {
-        cardsNumber: 5,
-        initialOffset: cardWrHeight*4,
+        cardsNumber: 6,
+        initialOffset: cardWrHeight*5,
         cards: [
             {
                 id: 0
@@ -53,15 +53,18 @@ export default class CardsListPR extends Component {
                 id: 3
             },{
                 id: 4
+            },{
+                id: 5
             }
         ]
     };
 
     cardHeight = cardWrHeight;
+    halfCardH = cardWrHeight/2;
 
-    state = {
-        currentOffset: cardWrHeight*4
-    };
+    // state = {
+    //     currentOffset: cardWrHeight*5
+    // };
 
     getStyle = ()=>{
         return [
@@ -78,34 +81,61 @@ export default class CardsListPR extends Component {
     };
 
     calculateOpacity = (index)=>{
-        // if(this.props.currentOffset <= this.props.initialOffset){
-        //     return 1;
-        // } else {
-        //     return (this.props.initialOffset === 0 ? 90 : this.props.initialOffset) / this.props.currentOffset;
-        // }
 
         if(index === 0){
             return {
                 opacity: this.yOffset.interpolate({
-                    inputRange:[0,cardWrHeight-50],
+                    inputRange:[0,cardWrHeight*3],
                     outputRange:[1,0]
                 })
             }
         }
 
+        const cardOffset = cardWrHeight*index;
+
         return {
             opacity: this.yOffset.interpolate({
-                inputRange:[cardWrHeight*index-50,cardWrHeight*1.5*index-50],
+                inputRange:[cardOffset,cardOffset*3],
                 outputRange:[1,0]
             })
         }
 
     };
 
+    calculateTranslateY = (index)=>{
+
+        // if(index === 0){
+        //     return {
+        //         transform:[
+        //             {
+        //                 translateY: this.yOffset.interpolate({
+        //                     inputRange:[0,cardWrHeight+20,this.props.initialOffset],
+        //                     outputRange:[10,cardWrHeight+19,this.props.initialOffset]
+        //                 })
+        //             }
+        //         ]
+        //     }
+        // }
+
+        const cardOffset = cardWrHeight*index;
+
+        return {
+            transform:[
+                {
+                    translateY: this.yOffset.interpolate({
+                        inputRange:[cardOffset-cardWrHeight,cardOffset,this.props.initialOffset],
+                        outputRange:[cardWrHeight,20,this.props.initialOffset - cardOffset]
+                    })
+                }
+            ]
+        }
+    };
+
     getCardStyle = (index)=>{
         return [
             styles.card,
-            this.calculateOpacity(index)
+            // this.calculateOpacity(index),
+            this.calculateTranslateY(index)
         ]
     };
 
@@ -115,7 +145,7 @@ export default class CardsListPR extends Component {
 
         const currentOffset = event.nativeEvent.contentOffset.y;
 
-        if(currentOffset + 50 > this.props.initialOffset){
+        if(currentOffset > this.props.initialOffset){
             return;
         }
 
@@ -138,11 +168,9 @@ export default class CardsListPR extends Component {
                         this.props.cards.map((card,i)=>{
                             return (
                                 <View key={card.id} style={this.getCardWrStyle()}>
-                                    <Animated.View style={this.getCardStyle(i)}>
-                                        <Text style={styles.text}>
-                                            {i+1}
-                                        </Text>
-                                    </Animated.View>
+                                    <Animated.Image source={require('../bg.png')} style={this.getCardStyle(i)}>
+
+                                    </Animated.Image>
                                 </View>
                             )
                         })
@@ -157,13 +185,13 @@ export default class CardsListPR extends Component {
 const styles = StyleSheet.create({
     cardsContainer: {
         height: screenHeight,
-        overflow: 'hidden'
+        // marginTop: 15
     },
     cardWr:{
         height: 100,
         alignSelf: 'stretch',
-        borderColor: 'green',
-        borderWidth: 1,
+        borderTopColor: 'green',
+        borderTopWidth: 1,
         // marginBottom: 15,
     },
     text:{
@@ -171,13 +199,13 @@ const styles = StyleSheet.create({
         textAlign: 'center'
     },
     card: {
-        height: 180,
+        height: 200,
         position: 'absolute',
         width: 320,
         marginHorizontal: 30,
         top: 0,
         left: 0,
-        backgroundColor: '#000',
+        // backgroundColor: '#000',
         borderRadius: 10,
         overflow: 'hidden',
         transform: [
@@ -185,7 +213,8 @@ const styles = StyleSheet.create({
             // { translateY: Dimensions.get('window').width * 0.24 },
             // { rotateX: '-60deg'},
         ],
-        borderColor: 'red',
+        borderColor: 'white',
         borderWidth: 1,
+        // backgroundImage: require('../bg.png'),
     }
 });
