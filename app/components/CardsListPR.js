@@ -22,7 +22,7 @@ const screenWidth = Dimensions.get('window').width,
     screenHeight = Dimensions.get('window').height - 60,
     initialHeight = 200;
 
-export const cardWrHeight = Math.floor((screenWidth-60)*0.62/2);
+export const cardWrHeight = Math.floor((screenWidth-60)*0.62);
 
 export default class CardsListPR extends Component {
 
@@ -73,10 +73,12 @@ export default class CardsListPR extends Component {
         ]
     };
 
-    getCardWrStyle = ()=>{
+    getCardWrStyle = (index)=>{
         return [
             styles.cardWr,
-            {}
+            {
+                height: index * 10
+            }
         ]
     };
 
@@ -106,32 +108,31 @@ export default class CardsListPR extends Component {
 
         const cardOffset = cardWrHeight*index || 0;
 
-        const initialNum = index === 0 ? 0 : cardWrHeight*index-(30*index);
+        const initialNum = index === 0 ? 20 : -60*index + 60;
+
+        // setTimeout(()=>{this.yOffset.setValue(0);},1000);
 
         return {
             transform:[
                 { perspective: 1000 },
                 {
-                    translateY: this.yOffset.interpolate({
-                        inputRange:[0,cardOffset,this.props.initialOffset],
-                        outputRange:[initialNum,20,this.props.initialOffset - cardOffset],
-                    })
+                    translateY: this.yOffset
                 },
-                {
-                    rotateX: this.yOffset.interpolate({
-                        inputRange: [-cardWrHeight, cardOffset, this.props.initialOffset],
-                        outputRange: ['-30deg','-10deg','0deg'],
-                    })
-                }
+                // {
+                //     rotateX: this.yOffset.interpolate({
+                //         inputRange: [-cardWrHeight, cardOffset, cardOffset*2],
+                //         outputRange: ['-60deg','-10deg', '0deg'],
+                //     })
+                // }
             ]
         }
     };
 
+
+
     getCardStyle = (index)=>{
         return [
-            styles.card,
-            // this.calculateOpacity(index),
-            this.calculateTranslateY(index)
+            styles.card
         ]
     };
 
@@ -142,11 +143,13 @@ export default class CardsListPR extends Component {
 
         this.currentOffset = event.nativeEvent.contentOffset.y;
 
-        // if(this.currentOffset > this.props.initialOffset){
-        //     return;
-        // }
+        if(this.currentOffset > this.props.initialOffset){
+            return;
+        }
 
-        return Animated.event([{ nativeEvent: { contentOffset: { y: this.yOffset } } }])(event)
+
+
+        // return Animated.event([{ nativeEvent: { contentOffset: { y: this.yOffset } } }])(event)
     };
 
     render() {
@@ -156,14 +159,14 @@ export default class CardsListPR extends Component {
                     showsVerticalScrollIndicator={false}
                     scrollEventThrottle={16}
                     onScroll={this.onScroll}
-                    contentOffset={{
-                        x: 0, y: this.props.initialOffset - this.cardHeight*1.5
-                    }}
+                    // contentOffset={{
+                    //     x: 0, y: this.props.initialOffset - this.cardHeight*1.5
+                    // }}
                 >
                     {
                         this.props.cards.map((card,i)=>{
                             return (
-                                <View key={card.id} style={this.getCardWrStyle()}>
+                                <View key={card.id} style={this.getCardWrStyle(i)}>
                                     <Animated.Image source={require('../bg.png')} style={this.getCardStyle(i)}>
 
                                     </Animated.Image>
@@ -195,7 +198,7 @@ const styles = StyleSheet.create({
         textAlign: 'center'
     },
     card: {
-        height: cardWrHeight*2,
+        height: cardWrHeight,
         position: 'absolute',
         width: 320,
         marginHorizontal: 30,
