@@ -22,6 +22,8 @@ const screenWidth = Dimensions.get('window').width,
     screenHeight = Dimensions.get('window').height - 60,
     initialHeight = 200;
 
+export const cardWrHeight = 100;
+
 export default class CardsListPR extends Component {
 
     // state={
@@ -68,7 +70,7 @@ export default class CardsListPR extends Component {
 
     static defaultProps = {
         cardsNumber: 5,
-        initialOffset: 180*4,
+        initialOffset: cardWrHeight*4,
         cards: [
             {
                 id: 0
@@ -84,10 +86,10 @@ export default class CardsListPR extends Component {
         ]
     };
 
-    cardHeight = 180;
+    cardHeight = cardWrHeight;
 
     state = {
-        currentOffset: 180*4
+        currentOffset: cardWrHeight*4
     };
 
     getStyle = ()=>{
@@ -99,6 +101,8 @@ export default class CardsListPR extends Component {
     handleScroll = (event)=>{
 
         const currentOffset = event.nativeEvent.contentOffset.y;
+
+        // console.dir(this.refs.scroll);
 
         if(currentOffset > this.props.initialOffset){
             return;
@@ -115,11 +119,14 @@ export default class CardsListPR extends Component {
                 <ScrollView
                     ref="scroll"
                     showsVerticalScrollIndicator={false}
-                    scrollEventThrottle={16}
+                    scrollEventThrottle={1}
                     onScroll={this.handleScroll}
-                    onContentSizeChange={(width,height) => {
-                        this.refs.scroll.scrollTo({x: 0, y: this.props.initialOffset, animated: false});
+                    contentOffset={{
+                        x: 0, y: this.props.initialOffset - (cardWrHeight*0)
                     }}
+                    // onContentSizeChange={(width,height) => {
+                    //     this.refs.scroll.scrollTo({x: 0, y: this.props.initialOffset - (cardWrHeight*0.3), animated: false});
+                    // }}
                 >
                     {
                         this.props.cards.map((card,i)=>{
@@ -127,6 +134,7 @@ export default class CardsListPR extends Component {
                                 active={i === 0} 
                                 currentOffset={this.state.currentOffset} 
                                 initialOffset={this.cardHeight*i}
+                                position={i+1}
                                 key={card.id}/>
                         })
                     }
@@ -140,8 +148,6 @@ export default class CardsListPR extends Component {
 const styles = StyleSheet.create({
     cardsContainer: {
         height: screenHeight,
-        marginBottom: 15,
-        overflow: 'hidden',
-        paddingBottom: 60
+        overflow: 'hidden'
     }
 });
