@@ -20,7 +20,7 @@ import HistoryComponent from "./HistoryComponent";
 const screenWidth = Dimensions.get('window').width,
     screenHeight = Dimensions.get('window').height - 60;
 
-export const cardWrHeight = Math.floor((screenWidth-60)*0.62);
+export const cardWrHeight = Math.floor((screenWidth-20)*0.62);
 
 export default class CardsListPR extends Component {
 
@@ -45,9 +45,9 @@ export default class CardsListPR extends Component {
     };
 
     state = {
-        height: [0,5,15,30,45,cardWrHeight],
+        height: [0,5,10,40,60,cardWrHeight-20],
         opacity: [0,0.3,0.3,0.7,.9,1],
-        rotateX: [0,0,0,0,0,-15],
+        rotateX: [0,0,0,-5,-10,-15],
         position: [0,0,5,20,50,95]
     };
 
@@ -86,8 +86,8 @@ export default class CardsListPR extends Component {
     currentOffset = 0;
 
     lastYPos = 0;
-    initialHeight = [0,5,15,35,45,cardWrHeight-20];
-    MAXIMAL_ROTATEX_VALUE = -70;
+    initialHeight = [0,5,10,40,60,cardWrHeight-20];
+    MAXIMAL_ROTATEX_VALUE = -80;
     sensitive = 40;
 
     _onStartShouldSetResponder = (e)=> {
@@ -115,7 +115,7 @@ export default class CardsListPR extends Component {
 
     handleScroll = (e)=>{
         const curYPos = e.nativeEvent.pageY,
-            step = (this.lastYPos - curYPos)*-1,
+            step = (this.lastYPos - curYPos)*-1*(this.sensitive/400),
             directionUp = step < 0;
 
         const resObj = {
@@ -129,23 +129,38 @@ export default class CardsListPR extends Component {
         this.state.height.forEach((num,i)=>{
             const pos = this.getElPosition(i);
 
-            const heightValue = num + step*(this.sensitive/100) + (pos > screenHeight ? 0 : directionUp ? pos/-50 : pos/5);
+            let heightValue = num,
+                rotateXValue = 0;
 
-            console.log(directionUp);
+
+            if(pos < screenHeight/1.8 && pos > 10){
+                heightValue += step*8;
+                rotateXValue -= pos/5;
+            } else if (pos > screenHeight/2){
+                rotateXValue -= pos/7;
+                // heightValue -= step*12;
+                // heightValue = heightValue < 45 ? 45 : heightValue;
+                // console.log(heightValue)
+            } else {
+                heightValue += step;
+            }
+
 
             resObj.height.push(heightValue >= cardWrHeight-20 ? cardWrHeight-20 : this.initialHeight[i] > heightValue ? this.initialHeight[i] : heightValue);
 
-            resObj.rotateX.push(pos/screenHeight/1.4*this.MAXIMAL_ROTATEX_VALUE);
-
-            // if(i===0) console.log(pos);
+            resObj.rotateX.push(rotateXValue > -360 ? pos < screenHeight ? rotateXValue : this.MAXIMAL_ROTATEX_VALUE : 360);
 
             resObj.opacity.push(pos/(screenHeight/1.7)*6.5);
         });
+
+        // if(resObj.height.reduce((sum,cur)=>{return sum+cur}) > 870) return;
 
 
         this.setState({
             ...resObj
         });
+
+        // console.log(resObj.height.reduce((sum,cur)=> sum+cur ));
 
         this.lastYPos = curYPos;
 
@@ -190,10 +205,10 @@ const styles = StyleSheet.create({
         height: cardWrHeight,
         alignSelf: 'stretch',
     },
-    text:{
-        color: '#fff',
-        textAlign: 'center'
-    },
+    // text:{
+    //     color: '#fff',
+        // textAlign: 'center'
+    // },
     card: {
         height: cardWrHeight,
         position: 'absolute',
