@@ -6,8 +6,9 @@ import React, { Component } from 'react';
 import {
     AppRegistry,
     StyleSheet,
-    Text,
     TouchableHighlight,
+    TouchableOpacity,
+    TouchableWithoutFeedback,
     Dimensions,
     View,
     Animated,
@@ -55,6 +56,8 @@ export default class CardsListPR extends Component {
         marginTop: 0
     };
 
+    initialHeight = [0,0,10,20,30,40,cardWrHeight-20];
+
     getStyle = ()=>{
         return [
             styles.cardsContainer,
@@ -94,7 +97,6 @@ export default class CardsListPR extends Component {
     currentOffset = 0;
 
     lastYPos = 0;
-    initialHeight = [0,0,10,20,30,40,cardWrHeight-20];
     MAXIMAL_ROTATEX_VALUE = -60;
     sensitive = 40;
 
@@ -172,6 +174,8 @@ export default class CardsListPR extends Component {
 
             resObj.height.push(heightValue);
 
+            // if(i===5) console.log(heightValue);
+
             resObj.opacity.push(pos/(screenHeight/1.7)*6.5);
 
             totalScrolled += heightValue;
@@ -182,7 +186,7 @@ export default class CardsListPR extends Component {
             ...resObj
         });
 
-        console.log(cardWrHeight)
+        // console.log(cardWrHeight)
 
         if(totalScrolled >= resObj.height.length*(cardWrHeight-20)){
             // this.scrollOn = true
@@ -202,8 +206,16 @@ export default class CardsListPR extends Component {
     scrolling = false;
     releaseInt = 0;
 
+    tapSensitive = 120;
+    tapedCardIndex = 0;
+
     handleRelease = (e)=>{
         this.dragging = false;
+
+        if((new Date()) - this.tapDate < this.tapSensitive){
+            console.log(this.tapedCardIndex)
+        }
+
     };
 
     scrollPos = 1;
@@ -211,6 +223,26 @@ export default class CardsListPR extends Component {
     onScroll = (event)=>{
         this.scrollPos = event.nativeEvent.contentOffset.y === undefined ? this.scrollPos : event.nativeEvent.contentOffset.y;
         this.scrollPos <= 0 && (this.scrollOn = false);
+    };
+
+    tapDate = 0;
+
+    onPress = (cardIndex,event)=>{
+
+        this.tapDate = new Date();
+
+        this.tapedCardIndex = cardIndex;
+
+        // setTimeout(()=>{
+        //
+        //     if(this.lastYPos !== lastYPos){
+        //         return;
+        //     }
+        //
+        //     console.log('TAP')
+        //
+        // },200)
+
     };
 
     render() {
@@ -230,11 +262,16 @@ export default class CardsListPR extends Component {
                     {
                         this.props.cards.map((card,i)=>{
                             return (
-                                <View key={card.id} style={this.getCardWrStyle(i)}>
-                                    <View style={this.getCardStyle(i)}>
-                                        <View style={styles.side} />
-                                        <Image source={require('../bg.png')} style={{width:320,height: cardWrHeight}} />
-                                    </View>
+                                <View key={card.id}
+                                      pointerEvents="auto"
+                                      accessible={true}
+                                      onStartShouldSetResponder={this.onPress.bind(this,i)}
+                                      style={this.getCardWrStyle(i)}
+                                    >
+                                        <View style={this.getCardStyle(i)}>
+                                            <View style={styles.side} />
+                                            <Image source={require('../bg.png')} style={{width:320,height: cardWrHeight}} />
+                                        </View>
                                 </View>
                             )
                         })
