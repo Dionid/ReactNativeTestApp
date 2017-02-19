@@ -69,15 +69,6 @@ export default class CardsListPR extends Component {
             styles.cardWr,
             {
                 height: this.state.height[index],
-                transform: [
-                    { perspective: 1000 },
-                    {
-                        translateY: this.state.translateY[index]
-                    },
-                    {
-                        rotateX: this.state.rotateX[index] + 'deg'
-                    }
-                ]
             }
         ]
     };
@@ -88,7 +79,13 @@ export default class CardsListPR extends Component {
             {
                 opacity: this.state.opacity[index],
                 transform: [
-                    { perspective: 1000 }
+                    { perspective: 1000 },
+                    {
+                        translateY: this.state.translateY[index]
+                    },
+                    {
+                        rotateX: this.state.rotateX[index] + 'deg'
+                    }
                 ]
             }
         ]
@@ -217,27 +214,9 @@ export default class CardsListPR extends Component {
         this.scrollPos <= 0 && (this.scrollOn = false);
     };
 
-    getUnderCardStyles = (index)=>{
-        return [
-            styles.underCard,
-            // {
-            //     opacity: this.state.opacity[index],
-            //     transform: [
-            //         { perspective: 1000 },
-            //         {
-            //             translateY: this.state.translateY[index]
-            //         },
-            //         {
-            //             rotateX: this.state.rotateX[index] + 'deg'
-            //         }
-            //     ]
-            // }
-        ]
-    };
-
     render() {
         return (
-            <ScrollView
+            <View
                 scrollEnabled={this.scrollOn}
                 onScroll={this.onScroll}
                 scrollEventThrottle={16}
@@ -253,16 +232,17 @@ export default class CardsListPR extends Component {
                         this.props.cards.map((card,i)=>{
                             return (
                                 <View key={card.id} style={this.getCardWrStyle(i)}>
-                                    <View style={this.getUnderCardStyles(i)}/>
-                                    <View style={styles.side} />
-                                    <Animated.Image source={require('../bg.png')} style={this.getCardStyle(i)}/>
+                                    <View style={this.getCardStyle(i)}>
+                                        <View style={styles.side} />
+                                        <Image source={require('../bg.png')} style={{width:320,height: cardWrHeight}} />
+                                    </View>
                                 </View>
                             )
                         })
                     }
                 </Animated.View>
                 <HistoryComponent/>
-            </ScrollView>
+            </View>
         );
     }
 }
@@ -279,17 +259,19 @@ const styles = StyleSheet.create({
     side:{
         width: 318,
         position:'absolute',
-        top:0,
+        height: cardWrHeight,
+        // top:-3,
         left:1,
-        height: 10,
-        borderRadius: 5,
+        borderRadius: 10,
         backgroundColor: '#333',
         transform: [
-            {rotateX:'-20deg' },
-            // {rotateZ:'-20deg'},
-            { perspective: 1000 },
+            {translateY:-3},
+            // {rotateX:'89deg'},
+            { perspective: 100 },
         ],
-        zIndex: -1
+        zIndex: -1,
+        // borderTopLeftRadius:4,
+        // borderTopRightRadius:4,
     },
     // text:{
     //     color: '#fff',
@@ -297,11 +279,17 @@ const styles = StyleSheet.create({
     // },
     card: {
         height: cardWrHeight,
-        position: 'absolute',
+        // position: 'absolute',
         width: 320,
         borderRadius: 10,
         backgroundColor: '#000',
-        zIndex: 10
+        shadowOpacity: 0.8,
+        shadowRadius: 5,
+        shadowOffset: {
+            height: 10,
+            width: 0
+        },
+        shadowColor: 'rgba(0,0,0,0.3)'
         // borderColor: 'white',
         // borderWidth: 1,
     },
@@ -318,6 +306,6 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         width: 316,
         position: 'absolute',
-        backgroundColor: '#000'
+        backgroundColor: 'white'
     }
 });
