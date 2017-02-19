@@ -40,16 +40,18 @@ export default class CardsListPR extends Component {
                 id: 4
             },{
                 id: 5
+            },{
+                id: 6
             }
         ]
     };
 
     state = {
-        height: [0,10,20,30,40,cardWrHeight-20],
-        opacity: [0,0.3,0.3,0.7,.9,1],
-        rotateX: [0,0,0,-5,-10,-15],
-        position: [0,0,5,20,50,95],
-        translateY: [0,0,0,0,0,0]
+        height: [0,0,10,20,30,40,cardWrHeight-20],
+        opacity: [0,0,0.3,0.3,0.7,.9,1],
+        rotateX: [0,0,0,0,-5,-10,-15],
+        position: [0,0,0,5,20,50,95],
+        translateY: [0,0,0,0,0,0,0]
     };
 
     getStyle = ()=>{
@@ -89,7 +91,7 @@ export default class CardsListPR extends Component {
     currentOffset = 0;
 
     lastYPos = 0;
-    initialHeight = [0,10,20,30,40,cardWrHeight-20];
+    initialHeight = [0,0,10,20,30,40,cardWrHeight-20];
     MAXIMAL_ROTATEX_VALUE = -60;
     sensitive = 40;
 
@@ -148,16 +150,16 @@ export default class CardsListPR extends Component {
             }
 
             if((pos*0.5) < (screenHeight/1.7)){
-                rotateXValue = (pos*0.5)/(screenHeight/1.7)*this.MAXIMAL_ROTATEX_VALUE - (i < 2 ? 15*i : 15);
+                rotateXValue = (pos*0.5)/(screenHeight/1.7)*this.MAXIMAL_ROTATEX_VALUE - (i < 2 ? 10*i : 10);
             } else if ((pos*0.5) > (screenHeight/1.7)){
-                rotateXValue = this.MAXIMAL_ROTATEX_VALUE - 15
+                rotateXValue = this.MAXIMAL_ROTATEX_VALUE - 10
             }
 
-            let translateY = 0;
+            let translateY = pos/screenHeight*(-10*i);
 
-            if(pos > screenHeight/1.7){
-                translateY = -20;
-            }
+            // if(pos > screenHeight/1.7){
+            //     translateY = pos/screenHeight*(-20*i);
+            // }
 
             resObj.translateY.push(translateY);
 
