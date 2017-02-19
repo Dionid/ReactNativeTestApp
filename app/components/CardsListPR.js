@@ -18,9 +18,9 @@ import {
 import HistoryComponent from "./HistoryComponent";
 
 const screenWidth = Dimensions.get('window').width,
-    screenHeight = Dimensions.get('window').height - 60;
+    screenHeight = Dimensions.get('window').height - 160;
 
-export const cardWrHeight = Math.floor((screenWidth-20)*0.62);
+export const cardWrHeight = Math.floor((screenWidth-60)*0.62);
 
 export default class CardsListPR extends Component {
 
@@ -45,10 +45,11 @@ export default class CardsListPR extends Component {
     };
 
     state = {
-        height: [0,5,10,40,60,cardWrHeight-20],
+        height: [0,10,20,30,40,cardWrHeight-20],
         opacity: [0,0.3,0.3,0.7,.9,1],
         rotateX: [0,0,0,-5,-10,-15],
-        position: [0,0,5,20,50,95]
+        position: [0,0,5,20,50,95],
+        translateY: [0,0,0,0,0,0]
     };
 
     getStyle = ()=>{
@@ -74,7 +75,9 @@ export default class CardsListPR extends Component {
             {
                 transform: [
                     { perspective: 1000 },
-                    { translateY: -20 },
+                    {
+                        translateY: this.state.translateY[index]
+                    },
                     {
                         rotateX: this.state.rotateX[index] + 'deg'
                     }
@@ -86,8 +89,8 @@ export default class CardsListPR extends Component {
     currentOffset = 0;
 
     lastYPos = 0;
-    initialHeight = [0,5,10,40,60,cardWrHeight-20];
-    MAXIMAL_ROTATEX_VALUE = -80;
+    initialHeight = [0,10,20,30,40,cardWrHeight-20];
+    MAXIMAL_ROTATEX_VALUE = -60;
     sensitive = 40;
 
     _onStartShouldSetResponder = (e)=> {
@@ -121,7 +124,8 @@ export default class CardsListPR extends Component {
         const resObj = {
             height: [],
             rotateX: [],
-            opacity: []
+            opacity: [],
+            translateY: []
         };
 
         // console.log(step)
@@ -133,24 +137,36 @@ export default class CardsListPR extends Component {
                 rotateXValue = 0;
 
 
-            if(pos < screenHeight/1.8 && pos > 10){
-                heightValue += step*8;
-                rotateXValue -= pos/5;
-            } else if (pos > screenHeight/2){
-                rotateXValue -= pos/7;
-                // heightValue -= step*12;
-                // heightValue = heightValue < 45 ? 45 : heightValue;
-                // console.log(heightValue)
+            // console.log(screenHeight/1.5);
+
+            if(pos < screenHeight/1.7 && pos > 15){
+                heightValue += step*15;
+            } else if (pos > screenHeight/1.7){
+                // heightValue -= step*(15*i);
             } else {
                 heightValue += step;
             }
 
+            if((pos*0.5) < (screenHeight/1.7)){
+                rotateXValue = (pos*0.5)/(screenHeight/1.7)*this.MAXIMAL_ROTATEX_VALUE - (i < 2 ? 15*i : 15);
+            } else if ((pos*0.5) > (screenHeight/1.7)){
+                rotateXValue = this.MAXIMAL_ROTATEX_VALUE - 15
+            }
+
+            let translateY = 0;
+
+            if(pos > screenHeight/1.7){
+                translateY = -20;
+            }
+
+            resObj.translateY.push(translateY);
 
             resObj.height.push(heightValue >= cardWrHeight-20 ? cardWrHeight-20 : this.initialHeight[i] > heightValue ? this.initialHeight[i] : heightValue);
 
-            resObj.rotateX.push(rotateXValue > -360 ? pos < screenHeight ? rotateXValue : this.MAXIMAL_ROTATEX_VALUE : 360);
+            resObj.rotateX.push(rotateXValue);
 
             resObj.opacity.push(pos/(screenHeight/1.7)*6.5);
+
         });
 
         // if(resObj.height.reduce((sum,cur)=>{return sum+cur}) > 870) return;
