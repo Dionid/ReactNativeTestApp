@@ -127,9 +127,9 @@ export default class CardsListPR extends Component {
 
     handleScroll = (event)=>{
 
-        // if(this.scrollPos > 10 || this.scrollPos < 0){
-        //     return;
-        // }
+        if(this.scrollPos > 10){
+            return;
+        }
 
         const curYPos = event.nativeEvent && event.nativeEvent.pageY || event,
             step = (this.lastYPos - curYPos)*-1*(this.sensitive/700),
@@ -210,19 +210,18 @@ export default class CardsListPR extends Component {
 
     onScroll = (event)=>{
         this.scrollPos = event.nativeEvent.contentOffset.y === undefined ? this.scrollPos : event.nativeEvent.contentOffset.y;
-        // console.log(this.scrollPos);
         this.scrollPos <= 0 && (this.scrollOn = false);
     };
 
     render() {
         return (
-            <View
+            <ScrollView
                 scrollEnabled={this.scrollOn}
                 onScroll={this.onScroll}
                 scrollEventThrottle={16}
                 style={this.getStyle()}
             >
-                <Animated.View
+                <View
                     onResponderMove={this.handleScroll}
                     onResponderRelease={this.handleRelease}
                     onStartShouldSetResponder={this._onStartShouldSetResponder}
@@ -240,9 +239,9 @@ export default class CardsListPR extends Component {
                             )
                         })
                     }
-                </Animated.View>
+                </View>
                 <HistoryComponent/>
-            </View>
+            </ScrollView>
         );
     }
 }
@@ -270,19 +269,12 @@ const styles = StyleSheet.create({
             { perspective: 100 },
         ],
         zIndex: -1,
-        // borderTopLeftRadius:4,
-        // borderTopRightRadius:4,
     },
-    // text:{
-    //     color: '#fff',
-        // textAlign: 'center'
-    // },
     card: {
         height: cardWrHeight,
         // position: 'absolute',
         width: 320,
         borderRadius: 10,
-        backgroundColor: '#000',
         shadowOpacity: 0.8,
         shadowRadius: 5,
         shadowOffset: {
@@ -290,8 +282,6 @@ const styles = StyleSheet.create({
             width: 0
         },
         shadowColor: 'rgba(0,0,0,0.3)'
-        // borderColor: 'white',
-        // borderWidth: 1,
     },
     underCard: {
         shadowOpacity: 0.8,
