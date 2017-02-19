@@ -51,13 +51,16 @@ export default class CardsListPR extends Component {
         opacity: [0,0,0.3,0.3,0.7,.9,1],
         rotateX: [0,0,0,0,-5,-10,-15],
         position: [0,0,0,5,20,50,95],
-        translateY: [0,0,0,0,0,0,0]
+        translateY: [0,0,0,0,0,0,0],
+        marginTop: 0
     };
 
     getStyle = ()=>{
         return [
             styles.cardsContainer,
-            {}
+            {
+                marginTop: this.state.marginTop
+            }
         ]
     };
 
@@ -66,15 +69,6 @@ export default class CardsListPR extends Component {
             styles.cardWr,
             {
                 height: this.state.height[index],
-                opacity: this.state.opacity[index]
-            }
-        ]
-    };
-
-    getCardStyle = (index)=>{
-        return [
-            styles.card,
-            {
                 transform: [
                     { perspective: 1000 },
                     {
@@ -83,6 +77,18 @@ export default class CardsListPR extends Component {
                     {
                         rotateX: this.state.rotateX[index] + 'deg'
                     }
+                ]
+            }
+        ]
+    };
+
+    getCardStyle = (index)=>{
+        return [
+            styles.card,
+            {
+                opacity: this.state.opacity[index],
+                transform: [
+                    { perspective: 1000 }
                 ]
             }
         ]
@@ -118,19 +124,28 @@ export default class CardsListPR extends Component {
         },this.state.height[0])
     };
 
-    handleScroll = (e)=>{
-        const curYPos = e.nativeEvent.pageY,
-            step = (this.lastYPos - curYPos)*-1*(this.sensitive/400),
+    componentDidMount(){
+        this.handleScroll(0)
+    }
+
+    handleScroll = (event)=>{
+
+        // if(this.scrollPos > 10 || this.scrollPos < 0){
+        //     return;
+        // }
+
+        const curYPos = event.nativeEvent && event.nativeEvent.pageY || event,
+            step = (this.lastYPos - curYPos)*-1*(this.sensitive/700),
             directionUp = step < 0;
 
         const resObj = {
             height: [],
             rotateX: [],
             opacity: [],
-            translateY: []
+            translateY: [],
         };
 
-        // console.log(step)
+        let totalScrolled = 0;
 
         this.state.height.forEach((num,i)=>{
             const pos = this.getElPosition(i);
@@ -138,16 +153,13 @@ export default class CardsListPR extends Component {
             let heightValue = num,
                 rotateXValue = 0;
 
-
-            // console.log(screenHeight/1.5);
-
             if(pos < screenHeight/1.7 && pos > 15){
                 heightValue += step*15;
-            } else if (pos > screenHeight/1.7){
-                // heightValue -= step*(15*i);
             } else {
                 heightValue += step;
             }
+
+            heightValue = heightValue >= cardWrHeight-20 ? cardWrHeight-20 : this.initialHeight[i] > heightValue ? this.initialHeight[i] : heightValue;
 
             if((pos*0.5) < (screenHeight/1.7)){
                 rotateXValue = (pos*0.5)/(screenHeight/1.7)*this.MAXIMAL_ROTATEX_VALUE - (i < 2 ? 10*i : 10);
@@ -157,40 +169,80 @@ export default class CardsListPR extends Component {
 
             let translateY = pos/screenHeight*(-10*i);
 
-            // if(pos > screenHeight/1.7){
-            //     translateY = pos/screenHeight*(-20*i);
-            // }
-
             resObj.translateY.push(translateY);
-
-            resObj.height.push(heightValue >= cardWrHeight-20 ? cardWrHeight-20 : this.initialHeight[i] > heightValue ? this.initialHeight[i] : heightValue);
 
             resObj.rotateX.push(rotateXValue);
 
+            resObj.height.push(heightValue);
+
             resObj.opacity.push(pos/(screenHeight/1.7)*6.5);
 
+            totalScrolled += heightValue;
+
         });
-
-        // if(resObj.height.reduce((sum,cur)=>{return sum+cur}) > 870) return;
-
 
         this.setState({
             ...resObj
         });
 
-        // console.log(resObj.height.reduce((sum,cur)=> sum+cur ));
+        console.log(cardWrHeight)
+
+        if(totalScrolled >= resObj.height.length*(cardWrHeight-20)){
+            // this.scrollOn = true
+        } else if (resObj.height.every((num,i) => num === this.initialHeight[i])){
+            this.scrollOn = true
+        } else {
+            this.scrollOn = false
+        }
+
+        // console.log();
 
         this.lastYPos = curYPos;
 
     };
 
+    scrollOn = false;
+    scrolling = false;
+    releaseInt = 0;
+
     handleRelease = (e)=>{
         this.dragging = false;
     };
 
+    scrollPos = 1;
+
+    onScroll = (event)=>{
+        this.scrollPos = event.nativeEvent.contentOffset.y === undefined ? this.scrollPos : event.nativeEvent.contentOffset.y;
+        // console.log(this.scrollPos);
+        this.scrollPos <= 0 && (this.scrollOn = false);
+    };
+
+    getUnderCardStyles = (index)=>{
+        return [
+            styles.underCard,
+            // {
+            //     opacity: this.state.opacity[index],
+            //     transform: [
+            //         { perspective: 1000 },
+            //         {
+            //             translateY: this.state.translateY[index]
+            //         },
+            //         {
+            //             rotateX: this.state.rotateX[index] + 'deg'
+            //         }
+            //     ]
+            // }
+        ]
+    };
+
     render() {
         return (
-            <View style={this.getStyle()}>
+            <ScrollView
+                scrollEnabled={this.scrollOn}
+                onScroll={this.onScroll}
+                scrollEventThrottle={16}
+                style={this.getStyle()}
+            >
                 <Animated.View
                     onResponderMove={this.handleScroll}
                     onResponderRelease={this.handleRelease}
@@ -201,16 +253,16 @@ export default class CardsListPR extends Component {
                         this.props.cards.map((card,i)=>{
                             return (
                                 <View key={card.id} style={this.getCardWrStyle(i)}>
-                                    <Animated.Image source={require('../bg.png')} style={this.getCardStyle(i)}>
-
-                                    </Animated.Image>
+                                    <View style={this.getUnderCardStyles(i)}/>
+                                    <View style={styles.side} />
+                                    <Animated.Image source={require('../bg.png')} style={this.getCardStyle(i)}/>
                                 </View>
                             )
                         })
                     }
-                    <HistoryComponent/>
                 </Animated.View>
-            </View>
+                <HistoryComponent/>
+            </ScrollView>
         );
     }
 }
@@ -220,8 +272,24 @@ const styles = StyleSheet.create({
         paddingTop: 20
     },
     cardWr:{
-        height: cardWrHeight,
+        // height: cardWrHeight,
         alignSelf: 'stretch',
+        marginHorizontal: 30,
+    },
+    side:{
+        width: 318,
+        position:'absolute',
+        top:0,
+        left:1,
+        height: 10,
+        borderRadius: 5,
+        backgroundColor: '#333',
+        transform: [
+            {rotateX:'-20deg' },
+            // {rotateZ:'-20deg'},
+            { perspective: 1000 },
+        ],
+        zIndex: -1
     },
     // text:{
     //     color: '#fff',
@@ -231,10 +299,25 @@ const styles = StyleSheet.create({
         height: cardWrHeight,
         position: 'absolute',
         width: 320,
-        marginHorizontal: 30,
         borderRadius: 10,
+        backgroundColor: '#000',
+        zIndex: 10
         // borderColor: 'white',
         // borderWidth: 1,
-
+    },
+    underCard: {
+        shadowOpacity: 0.8,
+        shadowRadius: 5,
+        shadowOffset: {
+            height: 10,
+            width: 0
+        },
+        shadowColor: 'rgba(0,0,0,0.3)',
+        marginHorizontal: 2,
+        height: cardWrHeight,
+        borderRadius: 10,
+        width: 316,
+        position: 'absolute',
+        backgroundColor: '#000'
     }
 });
