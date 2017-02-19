@@ -47,11 +47,51 @@ export default class CardsListPR extends Component {
     };
 
     state = {
-        height: [0,0,10,20,30,40,cardWrHeight-20],
-        opacity: [0,0,0.3,0.3,0.7,.9,1],
-        rotateX: [0,0,0,0,-5,-10,-15],
-        position: [0,0,0,5,20,50,95],
-        translateY: [0,0,0,0,0,0,0],
+        height: [
+            new Animated.Value(0),
+            new Animated.Value(0),
+            new Animated.Value(10),
+            new Animated.Value(20),
+            new Animated.Value(30),
+            new Animated.Value(40),
+            new Animated.Value(cardWrHeight-20)
+        ],
+        opacity: [
+            new Animated.Value(0),
+            new Animated.Value(0),
+            new Animated.Value(0.3),
+            new Animated.Value(0.3),
+            new Animated.Value(0.7),
+            new Animated.Value(0.9),
+            new Animated.Value(1)
+        ],
+        rotateX: [
+            new Animated.Value('0deg'),
+            new Animated.Value('0deg'),
+            new Animated.Value('0deg'),
+            new Animated.Value('0deg'),
+            new Animated.Value('-5deg'),
+            new Animated.Value('-10deg'),
+            new Animated.Value('-15deg')
+        ],
+        position: [
+            new Animated.Value(0),
+            new Animated.Value(0),
+            new Animated.Value(0),
+            new Animated.Value(5),
+            new Animated.Value(20),
+            new Animated.Value(50),
+            new Animated.Value(95)
+        ],
+        translateY: [
+            new Animated.Value(0),
+            new Animated.Value(0),
+            new Animated.Value(0),
+            new Animated.Value(0),
+            new Animated.Value(0),
+            new Animated.Value(0),
+            new Animated.Value(0)
+        ],
         marginTop: 0
     };
 
@@ -84,7 +124,7 @@ export default class CardsListPR extends Component {
                         translateY: this.state.translateY[index]
                     },
                     {
-                        rotateX: this.state.rotateX[index] + 'deg'
+                        rotateX: this.state.rotateX[index]
                     }
                 ]
             }
@@ -117,8 +157,8 @@ export default class CardsListPR extends Component {
 
     getElPosition = (index)=>{
         return this.state.height.slice(1,index).reduce((sum,cur)=>{
-            return sum + cur
-        },this.state.height[0])
+            return sum + cur._value
+        },this.state.height[0]._value)
     };
 
     componentDidMount(){
@@ -135,19 +175,23 @@ export default class CardsListPR extends Component {
             step = (this.lastYPos - curYPos)*-1*(this.sensitive/700),
             directionUp = step < 0;
 
-        const resObj = {
-            height: [],
-            rotateX: [],
-            opacity: [],
-            translateY: [],
-        };
+        // const resObj = {
+        //     height: [],
+        //     rotateX: [],
+        //     opacity: [],
+        //     translateY: [],
+        // };
 
         let totalScrolled = 0;
+
+        // console.log(this.state.height);
 
         this.state.height.forEach((num,i)=>{
             const pos = this.getElPosition(i);
 
-            let heightValue = num,
+            // console.log(num._value)
+
+            let heightValue = num._value,
                 rotateXValue = 0;
 
             if(pos < screenHeight/1.7 && pos > 15){
@@ -166,31 +210,31 @@ export default class CardsListPR extends Component {
 
             let translateY = pos/screenHeight*(-10*i);
 
-            resObj.translateY.push(translateY);
+            this.state.translateY[i].setValue(translateY);
 
-            resObj.rotateX.push(rotateXValue);
+            this.state.rotateX[i].setValue(rotateXValue+'deg');
 
-            resObj.height.push(heightValue);
+            this.state.height[i].setValue(heightValue);
 
-            resObj.opacity.push(pos/(screenHeight/1.7)*6.5);
+            this.state.opacity[i].setValue(pos/(screenHeight/1.7)*6.5);
 
             totalScrolled += heightValue;
 
         });
 
-        this.setState({
-            ...resObj
-        });
+        // this.setState({
+        //     ...resObj
+        // });
 
-        console.log(cardWrHeight)
+        // console.log(cardWrHeight)
 
-        if(totalScrolled >= resObj.height.length*(cardWrHeight-20)){
-            // this.scrollOn = true
-        } else if (resObj.height.every((num,i) => num === this.initialHeight[i])){
-            this.scrollOn = true
-        } else {
-            this.scrollOn = false
-        }
+        // if(totalScrolled >= resObj.height.length*(cardWrHeight-20)){
+        //     // this.scrollOn = true
+        // } else if (resObj.height.every((num,i) => num === this.initialHeight[i])){
+        //     this.scrollOn = true
+        // } else {
+        //     this.scrollOn = false
+        // }
 
         // console.log();
 
@@ -215,6 +259,9 @@ export default class CardsListPR extends Component {
     };
 
     render() {
+
+        console.log('render')
+
         return (
             <View
                 scrollEnabled={this.scrollOn}
@@ -222,7 +269,7 @@ export default class CardsListPR extends Component {
                 scrollEventThrottle={16}
                 style={this.getStyle()}
             >
-                <Animated.View
+                <View
                     onResponderMove={this.handleScroll}
                     onResponderRelease={this.handleRelease}
                     onStartShouldSetResponder={this._onStartShouldSetResponder}
@@ -231,16 +278,16 @@ export default class CardsListPR extends Component {
                     {
                         this.props.cards.map((card,i)=>{
                             return (
-                                <View key={card.id} style={this.getCardWrStyle(i)}>
-                                    <View style={this.getCardStyle(i)}>
+                                <Animated.View key={card.id} style={this.getCardWrStyle(i)}>
+                                    <Animated.View style={this.getCardStyle(i)}>
                                         <View style={styles.side} />
                                         <Image source={require('../bg.png')} style={{width:320,height: cardWrHeight}} />
-                                    </View>
-                                </View>
+                                    </Animated.View>
+                                </Animated.View>
                             )
                         })
                     }
-                </Animated.View>
+                </View>
                 <HistoryComponent/>
             </View>
         );
