@@ -35,7 +35,7 @@ export default class RocketTestApp extends Component {
     handleCardClose = ()=>{
         this.setState({
             modalActivated: false,
-            activeCard:0
+            activeCard:{}
         });  
     };
 

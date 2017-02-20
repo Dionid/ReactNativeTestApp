@@ -59,7 +59,7 @@ export default class CardsListPR extends Component {
     };
     
     shouldComponentUpdate(nextProps, nextState) {
-        if(nextProps.cards !== this.props.cards) return true;
+        if(nextProps.cards !== this.props.cards || nextState.height !== this.state.height) return true;
         return false;
     }
 
