@@ -184,7 +184,7 @@ export default class HistoryComponent extends Component{
 
 const styles = StyleSheet.create({
     historyContainer: {
-        marginTop: 60,
+        marginTop: 30,
         paddingHorizontal: 30,
         flex: 1,
         flexDirection: 'column',

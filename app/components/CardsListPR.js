@@ -24,6 +24,18 @@ const screenWidth = Dimensions.get('window').width,
 export const cardWrHeight = Math.floor((screenWidth-60)*0.62);
 
 export default class CardsListPR extends Component {
+    
+    static propTypes = {
+        cardsNumber: React.PropTypes.number,
+        cards: React.PropTypes.array
+    };
+    
+    currentOffset = 0;
+    lastYPos = 0;
+    MAXIMAL_ROTATE_X_VALUE = -60;
+    sensitive = 57;
+    screenHeight = screenHeight;
+    screenSeparatorPosY = screenHeight/1.7;
 
     static defaultProps = {
         cardsNumber: 6,
@@ -58,7 +70,7 @@ export default class CardsListPR extends Component {
 
     initialHeight = [0,0,10,20,30,40,cardWrHeight-20];
 
-    getStyle = ()=>{
+    getWrapperStyle = ()=>{
         return [
             styles.cardsContainer,
             {
@@ -94,15 +106,9 @@ export default class CardsListPR extends Component {
         ]
     };
 
-    currentOffset = 0;
-
-    lastYPos = 0;
-    MAXIMAL_ROTATEX_VALUE = -60;
-    sensitive = 40;
-
     _onStartShouldSetResponder = (e)=> {
         this.dragging = true;
-        //Setup initial drag coordinates
+        
         this.drag = {
             x: e.nativeEvent.pageX,
             y: e.nativeEvent.pageY
@@ -127,21 +133,67 @@ export default class CardsListPR extends Component {
         this.handleScroll(0)
     }
 
-    handleScroll = (event)=>{
+    /*
 
+     Вычитаем предыдущую позицию пальца (lastYPos) из текущей (curYPos) и получае расстояние,
+     на которое сдвинулся палец (step).
+     Умножаем на чувствительность (sensitive), деленную на 1000 (для удобства дальнейших расчетов),
+     чтобы уменьшить скорость анимации.
+     Умножаем на -1 (для удобства дальнейших расчетов).
+
+    */
+
+    getStep(curYPos,lastYPos,sensitive){
+        return (lastYPos - curYPos)*(sensitive/1000)*-1
+    }
+
+    getCardHeightValue(curHeight,initialHeight,screenSeparatorPos,pos,step,cardWrHeight){
+        let heightValue = curHeight;
+        if(pos < screenSeparatorPos && pos > 15){
+            heightValue += step*15;
+        } else {
+            heightValue += step;
+        }
+        return heightValue >= cardWrHeight-20 ? cardWrHeight-20 :initialHeight > heightValue ? initialHeight : heightValue;
+    }
+
+    getCardRotateXValue(curPos,screenSeparatorPos,maximalRotateXValue,cardIndex,initialRotationValue){
+        if(curPos < screenSeparatorPos){
+            return curPos/screenSeparatorPos*maximalRotateXValue + (cardIndex < 2 ? initialRotationValue*cardIndex : initialRotationValue);
+        } else if (curPos > screenSeparatorPos){
+            return maximalRotateXValue + initialRotationValue
+        }
+
+    }
+
+    handleScroll = (event)=>{
+        // Проверяем текущее значение позиции ScrollView,
+        // если позиция экрана не в самом начале (более 10 по Y), запрещаем переджвижение карточек
         if(this.scrollPos > 10){
             return;
         }
+        // ToDo: Можно убрать проверку и прокручивать скролл на самый верх, когда начинают двигаться карточки,
+        // нужно тестить на юзерах
 
+        /*
+            curYPos:number - берем текущую позицию пальца
+            ИЛИ число, которое приходит вместо event (нужно для первоначально инициализации)
+         */
+        /*
+            step:number - получаем шаг для анимации
+         */
+        /*
+            directionUp:boolean - движется ли палец вверх
+         */
         const curYPos = event.nativeEvent && event.nativeEvent.pageY || event,
-            step = (this.lastYPos - curYPos)*-1*(this.sensitive/700),
+            step = this.getStep(curYPos,this.lastYPos,this.sensitive),
             directionUp = step < 0;
 
         const resObj = {
             height: [],
-            rotateX: [],
-            opacity: [],
             translateY: [],
+            rotateX: [],
+            opacity: []
         };
 
         let totalScrolled = 0;
@@ -149,44 +201,23 @@ export default class CardsListPR extends Component {
         this.state.height.forEach((num,i)=>{
             const pos = this.getElPosition(i);
 
-            let heightValue = num,
-                rotateXValue = 0;
-
-            if(pos < screenHeight/1.7 && pos > 15){
-                heightValue += step*15;
-            } else {
-                heightValue += step;
-            }
-
-            heightValue = heightValue >= cardWrHeight-20 ? cardWrHeight-20 : this.initialHeight[i] > heightValue ? this.initialHeight[i] : heightValue;
-
-            if((pos*0.5) < (screenHeight/1.7)){
-                rotateXValue = (pos*0.5)/(screenHeight/1.7)*this.MAXIMAL_ROTATEX_VALUE - (i < 2 ? 10*i : 10);
-            } else if ((pos*0.5) > (screenHeight/1.7)){
-                rotateXValue = this.MAXIMAL_ROTATEX_VALUE - 10
-            }
-
-            let translateY = pos/screenHeight*(-10*i);
-
-            resObj.translateY.push(translateY);
-
-            resObj.rotateX.push(rotateXValue);
+            let heightValue = this.getCardHeightValue(num,this.initialHeight[i],this.screenSeparatorPosY,pos,step,cardWrHeight);
 
             resObj.height.push(heightValue);
 
-            // if(i===5) console.log(heightValue);
-
-            resObj.opacity.push(pos/(screenHeight/1.7)*6.5);
-
             totalScrolled += heightValue;
+
+            resObj.translateY.push(pos/this.screenHeight*(-10*i));
+
+            resObj.rotateX.push(this.getCardRotateXValue(pos*0.5,this.screenSeparatorPosY,this.MAXIMAL_ROTATE_X_VALUE,i,-10));
+
+            resObj.opacity.push(pos/this.screenSeparatorPosY*6.5);
 
         });
 
         this.setState({
             ...resObj
         });
-
-        // console.log(cardWrHeight)
 
         if(totalScrolled >= resObj.height.length*(cardWrHeight-20)){
             // this.scrollOn = true
@@ -196,8 +227,6 @@ export default class CardsListPR extends Component {
             this.scrollOn = false
         }
 
-        // console.log();
-
         this.lastYPos = curYPos;
 
     };
@@ -206,14 +235,14 @@ export default class CardsListPR extends Component {
     scrolling = false;
     releaseInt = 0;
 
-    tapSensitive = 120;
-    tapedCardIndex = 0;
+    tapTiming = 120;
+    tapedCardId = 0;
 
     handleRelease = (e)=>{
         this.dragging = false;
 
-        if((new Date()) - this.tapDate < this.tapSensitive){
-            console.log(this.tapedCardIndex)
+        if((new Date()) - this.tapDate < this.tapTiming){
+            console.log(this.tapedCardId)
         }
 
     };
@@ -227,22 +256,10 @@ export default class CardsListPR extends Component {
 
     tapDate = 0;
 
-    onPress = (cardIndex,event)=>{
+    onPress = (cardId,event)=>{
 
         this.tapDate = new Date();
-
-        this.tapedCardIndex = cardIndex;
-
-        // setTimeout(()=>{
-        //
-        //     if(this.lastYPos !== lastYPos){
-        //         return;
-        //     }
-        //
-        //     console.log('TAP')
-        //
-        // },200)
-
+        this.tapedCardId = cardId;
     };
 
     render() {
@@ -251,7 +268,7 @@ export default class CardsListPR extends Component {
                 scrollEnabled={this.scrollOn}
                 onScroll={this.onScroll}
                 scrollEventThrottle={16}
-                style={this.getStyle()}
+                style={this.getWrapperStyle()}
             >
                 <View
                     onResponderMove={this.handleScroll}
@@ -265,7 +282,7 @@ export default class CardsListPR extends Component {
                                 <View key={card.id}
                                       pointerEvents="auto"
                                       accessible={true}
-                                      onStartShouldSetResponder={this.onPress.bind(this,i)}
+                                      onStartShouldSetResponder={this.onPress.bind(this,card.id)}
                                       style={this.getCardWrStyle(i)}
                                     >
                                         <View style={this.getCardStyle(i)}>
@@ -285,7 +302,7 @@ export default class CardsListPR extends Component {
 
 const styles = StyleSheet.create({
     cardsContainer: {
-        paddingTop: 20
+        paddingTop: 0
     },
     cardWr:{
         // height: cardWrHeight,
@@ -305,7 +322,7 @@ const styles = StyleSheet.create({
             // {rotateX:'89deg'},
             { perspective: 100 },
         ],
-        zIndex: -1,
+        zIndex: -1
     },
     card: {
         height: cardWrHeight,
@@ -320,19 +337,19 @@ const styles = StyleSheet.create({
         },
         shadowColor: 'rgba(0,0,0,0.3)'
     },
-    underCard: {
-        shadowOpacity: 0.8,
-        shadowRadius: 5,
-        shadowOffset: {
-            height: 10,
-            width: 0
-        },
-        shadowColor: 'rgba(0,0,0,0.3)',
-        marginHorizontal: 2,
-        height: cardWrHeight,
-        borderRadius: 10,
-        width: 316,
-        position: 'absolute',
-        backgroundColor: 'white'
-    }
+    // underCard: {
+    //     shadowOpacity: 0.8,
+    //     shadowRadius: 5,
+    //     shadowOffset: {
+    //         height: 10,
+    //         width: 0
+    //     },
+    //     shadowColor: 'rgba(0,0,0,0.3)',
+    //     marginHorizontal: 2,
+    //     height: cardWrHeight,
+    //     borderRadius: 10,
+    //     width: 316,
+    //     position: 'absolute',
+    //     backgroundColor: 'white'
+    // }
 });
