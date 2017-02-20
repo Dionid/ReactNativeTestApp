@@ -10,7 +10,7 @@ import {
 import HistoryDay from "./HistoryDay";
 
 
-export default class HistoryList extends Component{
+export default class HistoryListPr extends Component{
 
     static propTypes = {
         historyList: React.PropTypes.array.isRequired

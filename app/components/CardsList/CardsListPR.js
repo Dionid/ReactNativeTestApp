@@ -16,7 +16,7 @@ import {
     ScrollView,
     Image
 } from 'react-native';
-import HistoryComponent from "../HistoryComponent/HistoryList";
+import HistoryListCont from "../HistoryComponent/HistoryListCont";
 
 const screenWidth = Dimensions.get('window').width,
     screenHeight = Dimensions.get('window').height - 160;
@@ -32,63 +32,7 @@ export default class CardsListPR extends Component {
 
     static defaultProps = {
         cardsNumber: 7,
-        cards: [],
-        historyList: [
-            {
-                id:0,
-                name: 'Сегодня',
-                totalSum: 5000,
-                transactions: [
-                    {
-                        id:0,
-                        bgImageUri: 'https://www.billa.at/WNBinaryWeb/120/4514406.png',
-                        name: 'Billa',
-                        sum: 1200,
-                        additional: '#Text'
-                    },
-                    {
-                        id:1,
-                        bgImageUri: 'https://www.billa.at/WNBinaryWeb/120/4514406.png',
-                        name: 'Billa',
-                        sum: 1200,
-                        additional: '#Text'
-                    },{
-                        id:2,
-                        bgImageUri: 'https://www.billa.at/WNBinaryWeb/120/4514406.png',
-                        name: 'Billa',
-                        sum: 1200,
-                        additional: '#Text'
-                    }
-                ]
-            },
-            {
-                id:1,
-                name: 'Вчера',
-                totalSum: 5000,
-                transactions: [
-                    {
-                        id:0,
-                        bgImageUri: 'https://www.billa.at/WNBinaryWeb/120/4514406.png',
-                        name: 'Billa',
-                        sum: 1200,
-                        additional: '#Text'
-                    },
-                    {
-                        id:1,
-                        bgImageUri: 'https://www.billa.at/WNBinaryWeb/120/4514406.png',
-                        name: 'Billa',
-                        sum: 1200,
-                        additional: '#Text'
-                    },{
-                        id:2,
-                        bgImageUri: 'https://www.billa.at/WNBinaryWeb/120/4514406.png',
-                        name: 'Billa',
-                        sum: 1200,
-                        additional: '#Text'
-                    }
-                ]
-            }
-        ]
+        cards: []
     };
     
     shouldComponentUpdate(nextProps, nextState) {
@@ -475,7 +419,7 @@ export default class CardsListPR extends Component {
                         })
                     }
                 </View>
-                <HistoryComponent historyList={this.props.historyList} />
+                <HistoryListCont />
             </ScrollView>
         );
     }
