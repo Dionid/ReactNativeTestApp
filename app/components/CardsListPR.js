@@ -26,8 +26,8 @@ export const cardWrHeight = Math.floor((screenWidth-60)*0.62);
 export default class CardsListPR extends Component {
     
     static propTypes = {
-        cardsNumber: React.PropTypes.number,
-        cards: React.PropTypes.array
+        cardsNumber: React.PropTypes.number.isRequired,
+        cards: React.PropTypes.array.isRequired
     };
     
     currentOffset = 0;
@@ -57,29 +57,6 @@ export default class CardsListPR extends Component {
         ]
     };
 
-    constructor(props){
-        super(props);
-
-        this.calculateInitialValues();
-
-        console.log(this.maxCardsContainerHeight, props)
-
-    }
-
-    calculateInitialHeight = (cardArray,cardWrHeight)=>{
-
-        const cardLength = cardArray.length;
-
-        return cardArray.map((num,ind)=>{
-
-            if(ind === cardLength-1) return cardWrHeight;
-
-            if(ind <= cardLength-6) return 0;
-
-            return -10*(cardLength - 6 - ind);
-
-        });
-    };
 
     state = {
         height: [],
@@ -89,9 +66,25 @@ export default class CardsListPR extends Component {
         marginTop: 0
     };
 
+
+    constructor(props){
+        super(props);
+        this.calculateInitialValues();
+    }
+
     calculateInitialValues = ()=>{
         this.maxCardsContainerHeight = this.props.cardsNumber*this.cardWrHeight;
         this.state.height = this.initialHeight = this.calculateInitialHeight(this.props.cards,this.cardWrHeight);
+        this.minCardsContainerHeight = this.initialHeight.reduce((sum,num)=> sum+num);
+    };
+
+    calculateInitialHeight = (cardArray,cardWrHeight)=>{
+        const cardLength = cardArray.length;
+        return cardArray.map((num,ind)=>{
+            if(ind === cardLength-1) return cardWrHeight;
+            if(ind <= cardLength-6) return 0;
+            return -10*(cardLength - 6 - ind);
+        });
     };
 
     componentDidMount(){
@@ -134,10 +127,14 @@ export default class CardsListPR extends Component {
         ]
     };
 
-    getElPosition = (index)=>{
-        return this.state.height.slice(1,index).reduce((sum,cur)=>{
+    getCardImageStyle = ()=>{
+        return styles.cardImage;
+    };
+
+    getElPosition = (heightArr,index)=>{
+        return heightArr.slice(1,index).reduce((sum,cur)=>{
             return sum + cur
-        },this.state.height[0])
+        },heightArr[0])
     };
 
     /*
@@ -161,7 +158,7 @@ export default class CardsListPR extends Component {
         if(pos < screenSeparatorPos && pos > 15){
             heightValue += step*15;
         } else {
-            heightValue += step;
+            heightValue += step*2;
         }
         return heightValue >= cardWrHeight ? cardWrHeight :initialHeight > heightValue ? initialHeight : heightValue;
     }
@@ -206,7 +203,7 @@ export default class CardsListPR extends Component {
         let totalScrolled = 0;
 
         this.state.height.forEach((num,i)=>{
-            const pos = this.getElPosition(i);
+            const pos = this.getElPosition(this.state.height,i);
 
             let heightValue = this.getCardHeightValue(num,this.initialHeight[i],this.screenSeparatorPosY,pos,step,cardWrHeight);
 
@@ -232,13 +229,17 @@ export default class CardsListPR extends Component {
 
     };
 
+    getNewStateObjectAndTotalScrolled = (heightArr)=>{
+
+    };
+
     scrollOn = false;
 
     toggleScrollOnTotalScrolled = (totalScrolled,arrOfCardHeights)=>{
-        if(totalScrolled >= arrOfCardHeights.length*(this.cardWrHeight)){
-            // this.scrollOn = true
-        } else if (arrOfCardHeights.every((num,i) => num === this.initialHeight[i])){
+        if (totalScrolled <= this.minCardsContainerHeight){
             this.scrollOn = true
+        } else if(totalScrolled >= this.maxCardsContainerHeight){
+            // this.scrollOn = true
         } else {
             this.scrollOn = false
         }
@@ -300,9 +301,10 @@ export default class CardsListPR extends Component {
         return (
             <ScrollView
                 scrollEnabled={this.scrollOn}
+                bounces={false}
                 onScroll={this.onScroll}
                 scrollEventThrottle={16}
-                style={this.getWrapperStyle()}
+                contentContainerStyle={this.getWrapperStyle()}
             >
                 <View
                     onStartShouldSetResponder={this._onStartShouldSetResponder}
@@ -321,7 +323,7 @@ export default class CardsListPR extends Component {
                                     >
                                         <View style={this.getCardStyle(i)}>
                                             <View style={styles.side} />
-                                            <Image source={require('../bg.png')} style={{width:320,height: cardWrHeight}} />
+                                            <Image source={require('../bg.png')} style={this.getCardImageStyle()} />
                                         </View>
                                 </View>
                             )
@@ -366,5 +368,9 @@ const styles = StyleSheet.create({
         //     width: 0
         // },
         // shadowColor: 'rgba(0,0,0,0.3)'
+    },
+    cardImage: {
+        width:320,
+        height: cardWrHeight
     }
 });
