@@ -16,18 +16,35 @@ import {
     Image
 } from 'react-native';
 import TabComponent from "./components/TabComponent";
-import HistoryComponent from "./components/HistoryComponent";
+import CardModal from "./components/CardModal";
 import CardsListPR from "./components/CardsListPR";
 
 export default class RocketTestApp extends Component {
+
+    state = {
+        modalActivated: false
+    };
+
+    handleCardTap = (e,card)=>{
+        this.setState({
+            modalActivated: true,
+            activeCard:card
+        });
+    };
+    
+    handleCardClose = ()=>{
+        this.setState({
+            modalActivated: false,
+            activeCard:0
+        });  
+    };
+
     render() {
         return (
             <View style={styles.container}>
+                <CardModal handleCardClose={this.handleCardClose} active={this.state.modalActivated} card={this.state.activeCard} />
                 <TabComponent/>
-
-                <CardsListPR/>
-
-                
+                <CardsListPR handleCardTap={this.handleCardTap}/>
             </View>
         );
     }

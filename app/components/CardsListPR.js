@@ -34,22 +34,34 @@ export default class CardsListPR extends Component {
         cardsNumber: 7,
         cards: [
             {
-                id: 0
+                id: 0,
+                sum: 1000
             },{
-                id: 1
+                id: 1,
+                sum: 2000
             },{
-                id: 2
+                id: 2,
+                sum: 3000
             },{
-                id: 3
+                id: 3,
+                sum: 4000
             },{
-                id: 4
+                id: 4,
+                sum: 5000
             },{
-                id: 5
+                id: 5,
+                sum: 6000
             },{
-                id: 6
+                id: 6,
+                sum: 7000
             }
         ]
     };
+    
+    shouldComponentUpdate(nextProps, nextState) {
+        if(nextProps.cards !== this.props.cards) return true;
+        return false;
+    }
 
     currentOffset = 0;
     MAXIMAL_ROTATE_X_VALUE = -60;
@@ -62,7 +74,8 @@ export default class CardsListPR extends Component {
         opacity: [],
         rotateX: [],
         translateY: [],
-        marginTop: 0
+        marginTop: 0,
+        modalActivated: false,
     };
 
     constructor(props){
@@ -391,7 +404,8 @@ export default class CardsListPR extends Component {
     };
 
     handleCardTap = (e,cardId)=>{
-        console.log(e,cardId);
+        // console.log(e,cardId);
+        this.props.handleCardTap(e,this.props.cards[cardId]);
     };
 
     render() {
@@ -413,8 +427,6 @@ export default class CardsListPR extends Component {
                         this.props.cards.map((card,i)=>{
                             return (
                                 <View key={card.id}
-                                      pointerEvents="auto"
-                                      accessible={true}
                                       onStartShouldSetResponder={this.onCardPressStart.bind(this,card.id)}
                                       style={this.getCardWrStyle(i)}
                                     >
