@@ -119,7 +119,53 @@ export class CardModal extends Component{
                 <Animated.View style={this.getModalBodyStyle()}>
                     <Image source={require('../bg.png')} style={this.getCardImageStyle()} />
                     <View style={styles.modalBodyContent}>
-                        <Text >modal</Text>
+                        <ScrollView style={styles.modalBodyContentList}>
+                            <TouchableOpacity style={styles.modalBtn}>
+                                <Text style={styles.modalBtnIcon}>+</Text>
+                                <Text style={styles.modalBtnText}>Пополнить карту</Text>
+                                <Text style={styles.modalBtnText__Additional}>Additional</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.modalBtn}>
+                                <Text style={styles.modalBtnIcon}>+</Text>
+                                <Text style={styles.modalBtnText}>Пополнить карту</Text>
+                                <Text style={styles.modalBtnText__Additional}>Additional</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.modalBtn}>
+                                <Text style={styles.modalBtnIcon}>+</Text>
+                                <Text style={styles.modalBtnText}>Пополнить карту</Text>
+                                <Text style={styles.modalBtnText__Additional}>Additional</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.modalBtn}>
+                                <Text style={styles.modalBtnIcon}>+</Text>
+                                <Text style={styles.modalBtnText}>Пополнить карту</Text>
+                                <Text style={styles.modalBtnText__Additional}>Additional</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.modalBtn}>
+                                <Text style={styles.modalBtnIcon}>+</Text>
+                                <Text style={styles.modalBtnText}>Пополнить карту</Text>
+                                <Text style={styles.modalBtnText__Additional}>Additional</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.modalBtn}>
+                                <Text style={styles.modalBtnIcon}>+</Text>
+                                <Text style={styles.modalBtnText}>Пополнить карту</Text>
+                                <Text style={styles.modalBtnText__Additional}>Additional</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.modalBtn}>
+                                <Text style={styles.modalBtnIcon}>+</Text>
+                                <Text style={styles.modalBtnText}>Пополнить карту</Text>
+                                <Text style={styles.modalBtnText__Additional}>Additional</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.modalBtn}>
+                                <Text style={styles.modalBtnIcon}>+</Text>
+                                <Text style={styles.modalBtnText}>Пополнить карту</Text>
+                                <Text style={styles.modalBtnText__Additional}>Additional</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.modalBtn}>
+                                <Text style={styles.modalBtnIcon}>+</Text>
+                                <Text style={styles.modalBtnText}>Пополнить карту</Text>
+                                <Text style={styles.modalBtnText__Additional}>Additional</Text>
+                            </TouchableOpacity>
+                        </ScrollView>
                     </View>
                 </Animated.View>
             </AnimatedBlurView>
@@ -150,6 +196,7 @@ const styles = StyleSheet.create({
     },
     modalBody:{
         width: screenWidth,
+        height: screenHeight - cardHeight*0.6,
         flex:1,
         // backgroundColor: '#fff',
         // borderTopLeftRadius: 20,
@@ -169,6 +216,36 @@ const styles = StyleSheet.create({
         shadowOffset: {width: 0, height: 2},
         shadowRadius: 2,
         shadowOpacity: 1.0,
+    },
+    modalBodyContentList:{
+        paddingHorizontal: 30,
+        flex: 1,
+        paddingVertical: 30,
+        marginBottom: 30
+    },
+    modalBtn: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingVertical: 15,
+        borderBottomColor: 'rgba(255,255,255,0.5)',
+        borderBottomWidth: 1
+    },
+    modalBtnIcon:{
+        color: '#fff',
+        fontSize: 20,
+
+    },
+    modalBtnText: {
+        color: '#fff',
+        paddingLeft: 10,
+        flex: 1,
+        marginTop: 3
+    },
+    modalBtnText__Additional:{
+        color: '#fff',
+        opacity: 0.6,
+        marginTop: 3
     }
 });
 
