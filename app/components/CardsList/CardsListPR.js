@@ -16,7 +16,7 @@ import {
     ScrollView,
     Image
 } from 'react-native';
-import HistoryComponent from "./HistoryComponent/HistoryComponent";
+import HistoryComponent from "../HistoryComponent/HistoryList";
 
 const screenWidth = Dimensions.get('window').width,
     screenHeight = Dimensions.get('window').height - 160;
@@ -32,30 +32,7 @@ export default class CardsListPR extends Component {
 
     static defaultProps = {
         cardsNumber: 7,
-        cards: [
-            {
-                id: 0,
-                sum: 1000
-            },{
-                id: 1,
-                sum: 2000
-            },{
-                id: 2,
-                sum: 3000
-            },{
-                id: 3,
-                sum: 4000
-            },{
-                id: 4,
-                sum: 5000
-            },{
-                id: 5,
-                sum: 6000
-            },{
-                id: 6,
-                sum: 7000
-            }
-        ],
+        cards: [],
         historyList: [
             {
                 id:0,
@@ -115,8 +92,14 @@ export default class CardsListPR extends Component {
     };
     
     shouldComponentUpdate(nextProps, nextState) {
-        if(nextProps.cards !== this.props.cards || nextState.height !== this.state.height) return true;
-        return false;
+        return nextProps.cards !== this.props.cards || nextState.height !== this.state.height;
+    }
+
+    componentWillReceiveProps(nextProps){
+        if(nextProps.cards.length) {
+            this.calculateInitialValues();
+            this.handleScroll(0);
+        }
     }
 
     currentOffset = 0;
@@ -131,13 +114,8 @@ export default class CardsListPR extends Component {
         rotateX: [],
         translateY: [],
         marginTop: 0,
-        modalActivated: false,
+        modalActivated: false
     };
-
-    constructor(props){
-        super(props);
-        this.calculateInitialValues();
-    }
 
     /*
     * Подсчитываю начальные значения высоты, минимальный и максимальный размеры контейнера с кароточками
@@ -169,6 +147,7 @@ export default class CardsListPR extends Component {
     * Просчитываем начальное состояние карточек
     * */
     componentDidMount(){
+        this.calculateInitialValues();
         this.handleScroll(0)
     }
 
@@ -489,7 +468,7 @@ export default class CardsListPR extends Component {
                                     >
                                         <View style={this.getCardStyle(i)}>
                                             <View style={styles.side} />
-                                            <Image source={require('../bg.png')} style={this.getCardImageStyle()} />
+                                            <Image source={require('../../bg.png')} style={this.getCardImageStyle()} />
                                         </View>
                                 </View>
                             )

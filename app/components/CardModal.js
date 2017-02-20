@@ -17,7 +17,7 @@ import {
     Image
 } from 'react-native';
 import { BlurView, VibrancyView } from "react-native-blur";
-import {cardWrHeight} from "./CardsListPR";
+import {cardWrHeight} from "./CardsList/CardsListPR";
 
 const screenWidth = Dimensions.get('window').width,
     screenHeight = Dimensions.get('window').height;
