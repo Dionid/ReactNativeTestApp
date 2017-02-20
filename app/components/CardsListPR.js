@@ -55,6 +55,22 @@ export default class CardsListPR extends Component {
                 id: 6,
                 sum: 7000
             }
+        ],
+        historyList: [
+            {
+                id:0,
+                name: 'Сегодня',
+                totalSum: 5000,
+                transactions: [
+                    {
+                        id:0,
+                        bgImageUri: 'https://www.billa.at/WNBinaryWeb/120/4514406.png',
+                        name: 'Billa',
+                        sum: 1200,
+                        additional: '#Text'
+                    }
+                ]
+            }
         ]
     };
     
@@ -439,7 +455,7 @@ export default class CardsListPR extends Component {
                         })
                     }
                 </View>
-                <HistoryComponent/>
+                <HistoryComponent historyList={this.props.historyList} />
             </ScrollView>
         );
     }

@@ -15,8 +15,12 @@ import {
 
 export default class HistoryComponent extends Component{
 
+    static propTypes = {
+        historyList: React.PropTypes.array.isRequired
+    };
+
     shouldComponentUpdate(nextProps, nextState) {
-        return false;
+        return nextProps.historyList !== this.props.historyList;
     }
 
     render(){
@@ -29,6 +33,7 @@ export default class HistoryComponent extends Component{
             history__image,
             history__title_container,
             history__title,
+            history__subTitle,
             history__sum
         } = styles;
         
@@ -37,146 +42,53 @@ export default class HistoryComponent extends Component{
 
         return (
             <View style={historyContainer}>
-                <View style={historyRow__Day}>
-                    <View style={historyRow__Inner}>
-                        <Text style={history__dayName}>
-                            Сегодня
-                        </Text>
-                        <Text style={history__daySum}>
-                            -5800 Р
-                        </Text>
-                    </View>
-                </View>
-                <View style={historyRow}>
-                    <View style={historyRow__Inner}>
-                        <Image
-                            style={history__image}
-                            source={{uri:'https://www.billa.at/WNBinaryWeb/120/4514406.png'}}
-                        />
-                        <View
-                            style={history__title_container}
-                        >
-                            <Text style={history__title}>
-                                Billadas
-                            </Text>
-                        </View>
-                        <Text
-                            style={history__sum}
-                        >
-                            -1 200 Р
-                        </Text>
-                    </View>
-                </View>
-                <View style={historyRow}>
-                    <View style={historyRow__Inner}>
-                        <Image
-                            style={history__image}
-                            source={{uri:'https://www.billa.at/WNBinaryWeb/120/4514406.png'}}
-                        />
-                        <View
-                            style={history__title_container}
-                        >
-                            <Text style={history__title}>
-                                Billadas
-                            </Text>
-                        </View>
-                        <Text
-                            style={history__sum}
-                        >
-                            -1 200 Р
-                        </Text>
-                    </View>
-                </View>
-                <View style={historyRow}>
-                    <View style={historyRow__Inner}>
-                        <Image
-                            style={history__image}
-                            source={{uri:'https://www.billa.at/WNBinaryWeb/120/4514406.png'}}
-                        />
-                        <View
-                            style={history__title_container}
-                        >
-                            <Text style={history__title}>
-                                Billadas
-                            </Text>
-                        </View>
-                        <Text
-                            style={history__sum}
-                        >
-                            -1 200 Р
-                        </Text>
-                    </View>
-                </View>
-                <View style={historyRow__Day}>
-                    <View style={historyRow__Inner}>
-                        <Text style={history__dayName}>
-                            Сегодня
-                        </Text>
-                        <Text style={history__daySum}>
-                            -5800 Р
-                        </Text>
-                    </View>
-                </View>
-                <View style={historyRow}>
-                    <View style={historyRow__Inner}>
-                        <Image
-                            style={history__image}
-                            source={{uri:'https://www.billa.at/WNBinaryWeb/120/4514406.png'}}
-                        />
-                        <View
-                            style={history__title_container}
-                        >
-                            <Text style={history__title}>
-                                Billadas
-                            </Text>
-                        </View>
-                        <Text
-                            style={history__sum}
-                        >
-                            -1 200 Р
-                        </Text>
-                    </View>
-                </View>
-                <View style={historyRow}>
-                    <View style={historyRow__Inner}>
-                        <Image
-                            style={history__image}
-                            source={{uri:'https://www.billa.at/WNBinaryWeb/120/4514406.png'}}
-                        />
-                        <View
-                            style={history__title_container}
-                        >
-                            <Text style={history__title}>
-                                Billadas
-                            </Text>
-                        </View>
-                        <Text
-                            style={history__sum}
-                        >
-                            -1 200 Р
-                        </Text>
-                    </View>
-                </View>
-                <View style={historyRow}>
-                    <View style={historyRow__Inner}>
-                        <Image
-                            style={history__image}
-                            source={{uri:'https://www.billa.at/WNBinaryWeb/120/4514406.png'}}
-                        />
-                        <View
-                            style={history__title_container}
-                        >
-                            <Text style={history__title}>
-                                Billadas
-                            </Text>
-                        </View>
-                        <Text
-                            style={history__sum}
-                        >
-                            -1 200 Р
-                        </Text>
-                    </View>
-                </View>
+                {
+                    this.props.historyList.map((day)=>{
+                        return (
+                            <View key={day.id}>
+                                <View style={historyRow__Day}>
+                                    <View style={historyRow__Inner}>
+                                        <Text style={history__dayName}>
+                                            {day.name}
+                                        </Text>
+                                        <Text style={history__daySum}>
+                                            {day.totalSum} Р
+                                        </Text>
+                                    </View>
+                                </View>
+                                { day.transactions.map(transaction=>{
+                                    return (
+                                        <View key={transaction.id} style={historyRow}>
+                                            <View style={historyRow__Inner}>
+                                                <Image
+                                                    style={history__image}
+                                                    source={{uri:transaction.bgImageUri}}
+                                                />
+                                                <View
+                                                    style={history__title_container}
+                                                >
+                                                    <Text style={history__title}>
+                                                        {transaction.name}
+                                                    </Text>
+                                                    <Text style={history__subTitle}>
+                                                        {transaction.additional}
+                                                    </Text>
+                                                </View>
+                                                <Text
+                                                    style={history__sum}
+                                                >
+                                                    -{transaction.sum} Р
+                                                </Text>
+                                            </View>
+                                        </View>
+                                    )
+                                }) }
+                            </View>
+                        )
+                    })
+                }
+
+
             </View>
         );
     }
@@ -224,5 +136,8 @@ const styles = StyleSheet.create({
     },
     history__sum:{
         fontSize: 16
+    },
+    history__subTitle:{
+        opacity: 0.7
     }
 });
