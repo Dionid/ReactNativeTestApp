@@ -29,12 +29,6 @@ export default class CardsListPR extends Component {
         cardsNumber: React.PropTypes.number.isRequired,
         cards: React.PropTypes.array.isRequired
     };
-    
-    currentOffset = 0;
-    MAXIMAL_ROTATE_X_VALUE = -60;
-    cardWrHeight = cardWrHeight-20;
-    screenHeight = screenHeight;
-    screenSeparatorPosY = screenHeight/1.7;
 
     static defaultProps = {
         cardsNumber: 7,
@@ -57,6 +51,11 @@ export default class CardsListPR extends Component {
         ]
     };
 
+    currentOffset = 0;
+    MAXIMAL_ROTATE_X_VALUE = -60;
+    cardWrHeight = cardWrHeight-20;
+    screenHeight = screenHeight;
+    screenSeparatorPosY = screenHeight/1.7;
 
     state = {
         height: [],
@@ -66,32 +65,45 @@ export default class CardsListPR extends Component {
         marginTop: 0
     };
 
-
     constructor(props){
         super(props);
         this.calculateInitialValues();
     }
 
+    /*
+    * Подсчитываю начальные значения высоты, минимальный и максимальный размеры контейнера с кароточками
+    * (для выключения и велючеия ScrollView)
+    * */
     calculateInitialValues = ()=>{
         this.maxCardsContainerHeight = this.props.cardsNumber*this.cardWrHeight;
         this.state.height = this.initialHeight = this.calculateInitialHeight(this.props.cards,this.cardWrHeight);
         this.minCardsContainerHeight = this.initialHeight.reduce((sum,num)=> sum+num);
     };
 
+    /*
+    * Выставляю начальный массив с высотой каждой карточки в начальной позиции.
+    * Последние 5 карточек имеют высоту в 10, 20, 30, 40, cardHeight соответственно.
+    *
+    * @param cardArray:array - массив с информацией по карточкам, нужен только для определения количества
+    * @param cardWrHeight?:number - высота одной карточки
+    * */
     calculateInitialHeight = (cardArray,cardWrHeight)=>{
         const cardLength = cardArray.length;
         return cardArray.map((num,ind)=>{
-            if(ind === cardLength-1) return cardWrHeight;
+            if(ind === cardLength-1) return cardWrHeight || this.cardWrHeight;
             if(ind <= cardLength-6) return 0;
             return -10*(cardLength - 6 - ind);
         });
     };
 
+    /*
+    * Просчитываем начальное состояние карточек
+    * */
     componentDidMount(){
         this.handleScroll(0)
     }
 
-    getWrapperStyle = ()=>{
+    getMainContainerStyle = ()=>{
         return [
             styles.cardsContainer,
             {
@@ -100,15 +112,21 @@ export default class CardsListPR extends Component {
         ]
     };
 
+    /*
+    * Выставляем высоту обертки карточки, в зависимости от ее index
+    * */
     getCardWrStyle = (index)=>{
         return [
             styles.cardWr,
             {
-                height: this.state.height[index] || 0,
+                height: this.state.height[index] || 0
             }
         ]
     };
 
+    /*
+     * Выставляем opacity, translateY и rotateX карточки, в зависимости от ее index
+     * */
     getCardStyle = (index)=>{
         return [
             styles.card,
@@ -131,28 +149,58 @@ export default class CardsListPR extends Component {
         return styles.cardImage;
     };
 
+
+    /*
+    * Вычисляем позицию карточки от верха экрана на основании сложения высот всех ранееидущих карточек
+    * */
     getElPosition = (heightArr,index)=>{
         return heightArr.slice(1,index).reduce((sum,cur)=>{
             return sum + cur
         },heightArr[0])
     };
 
-    /*
-
-     Вычитаем предыдущую позицию пальца (lastYPos) из текущей (curYPos) и получае расстояние,
-     на которое сдвинулся палец (step).
-     Умножаем на чувствительность (sensitive), деленную на 1000 (для удобства дальнейших расчетов),
-     чтобы уменьшить скорость анимации.
-     Умножаем на -1 (для удобства дальнейших расчетов).
-
-    */
-
     sensitive = 57;
 
-    getStep(curYPos,lastYPos,sensitive){
-        return (lastYPos - curYPos)*(sensitive/1000)*-1
+     /*
+     * Вычисляем шаг для анимации. Процесс:
+
+     * Вычитаем предыдущую позицию пальца (prevYPos) из текущей (curYPos) и получае расстояние,
+     * на которое сдвинулся палец (step).
+
+     * Умножаем на чувствительность (sensitive), деленную на 1000 (для удобства дальнейших расчетов),
+     * чтобы уменьшить скорость анимации.
+
+     * Умножаем на -1 (для удобства дальнейших расчетов).
+     *
+     * @param curYPos:number - текущая позиция пальца
+     * @param prevYPos:number - предыдущая позиция пальца
+     * @param sensitive:number - чувствительность анимации (чем выше, тем медленнее протекает анимация)
+     * */
+    getStep(curYPos,prevYPos,sensitive){
+        return (prevYPos - curYPos)*(sensitive/1000)*-1
     }
 
+    /*
+    * Вычисляем высоту карточки, на основании позиции по отношению к экрану, шага
+    * и проверяем не выходят ли значения за рамки. Процесс:
+    *
+    * Проверяем, если карточка находится в "зоне ускорения", где высота должна увеличиваться быстрее (pos < screenSeparatorPos && pos > 15)
+    * то сильно увеличиваем шаг.
+    * Если она находится выше начальной или конечной отметки "зоны ускорения", то шаг увеличивается несильно.
+    *
+    * Проверяем больше ли высота карточки, чем максимальная:
+        * Если да, возвращаем максимальную высоту карточки.
+        * Если нет, проверяем не меньше ли она своей начальной высоты:
+            * Если да, возвращаем начальную высоту
+            * Если нет, возвращаем модифицированную высоту
+    *
+    * @param curHeight:number - высота карточки на данный момент
+    * @param initialHeight:number - начальная высота карточки
+    * @param screenSeparatorPos:number - позиция, до которой распологается "зона ускорения"
+    * @param pos:number - позиция карточки на данный момент
+    * @param step:number - щаг анимации
+    * @param cardWrHeight:number - максимальная высота карточки
+    * */
     getCardHeightValue(curHeight,initialHeight,screenSeparatorPos,pos,step,cardWrHeight){
         let heightValue = curHeight;
         if(pos < screenSeparatorPos && pos > 15){
@@ -160,37 +208,56 @@ export default class CardsListPR extends Component {
         } else {
             heightValue += step*2;
         }
-        return heightValue >= cardWrHeight ? cardWrHeight :initialHeight > heightValue ? initialHeight : heightValue;
+        return heightValue >= cardWrHeight ? cardWrHeight : heightValue < initialHeight ? initialHeight : heightValue;
     }
 
+    /*
+    * Вычисляем поворот карточки по оси X на основании позиции по отношению к экрану, шага
+    * и проверяем не выходят ли значения за рамки. Процесс:
+    *
+    * Проверяем, если карточка находится в "зоне ускорения":
+    * Если да, то карточка поворачивается в заивисимости от положения и ее index в массиве (первая карточка поворачивается медленнее)
+    * Если нет, то вовзращаем сумму максимального и начального поворота
+    *
+    * @param curPos:number - текущее положение карточки
+    * @param screenSeparatorPos:number - позиция конца "зоны ускорения"
+    * @param maximalRotateXValue:number - максимальный поворот карточки
+    * @param cardIndex:number - индекс карточки
+    * @param initialRotationValue:number - начальное значение поворота карточки
+    * */
     getCardRotateXValue(curPos,screenSeparatorPos,maximalRotateXValue,cardIndex,initialRotationValue){
         if(curPos < screenSeparatorPos){
-            return curPos/screenSeparatorPos*maximalRotateXValue + (cardIndex < 2 ? initialRotationValue*cardIndex : initialRotationValue);
+            return curPos/screenSeparatorPos*maximalRotateXValue + (cardIndex < 1 ? 0 : initialRotationValue);
         } else if (curPos > screenSeparatorPos){
             return maximalRotateXValue + initialRotationValue
         }
     }
 
-    getCardOpacity(curPos,screenSeparatorPosY){
-        return curPos/(screenSeparatorPosY*0.2)+0.05
+    /*
+    * Вычисляем прозрачность карточки, на основании ее положения по отношению к "зоне ускорения"
+    * @param curPos:number -  текущее положение карточки
+    * @param screenSeparatorPos:number - позиция конца "зоны ускорения"
+    * */
+    getCardOpacity(curPos,screenSeparatorPos){
+        return curPos/(screenSeparatorPos*0.2)+0.05
     }
 
     handleScroll = (event)=>{
-        // Проверяем текущее значение позиции ScrollView,
-        // если позиция экрана не в самом начале (более 10 по Y), запрещаем переджвижение карточек
+        /*
+        * Проверяем текущее значение позиции ScrollView,
+        * если позиция экрана не в самом начале (более 10 по Y), запрещаем переджвижение карточек
+        * */
         if(this.scrollPos > 10){
             return;
         }
-        // ToDo: Можно убрать проверку и прокручивать скролл на самый верх, когда начинают двигаться карточки,
-        // нужно тестить на юзерах
 
-
-        // @const curYPos:number - берем текущую позицию пальца ИЛИ число, которое приходит вместо event (нужно для первоначально инициализации)
-        // @const step:number - получаем шаг для анимации
-        // @const directionUp:boolean - движется ли палец вверх
-
+            // @const curYPos:number - берем текущую позицию пальца ИЛИ число, которое приходит вместо event (нужно для первоначально инициализации)
         const curYPos = event.nativeEvent && event.nativeEvent.pageY || event,
-            step = this.getStep(curYPos,this.lastYPos,this.sensitive),
+
+            // @const step:number - получаем шаг для анимации
+            step = this.getStep(curYPos,this.prevYPos,this.sensitive),
+
+            // @const directionUp:boolean - движется ли палец вверх
             directionUp = step < 0;
 
         const resObj = {
@@ -200,7 +267,7 @@ export default class CardsListPR extends Component {
             opacity: []
         };
 
-        let totalScrolled = 0;
+        let cardsContainerHeight = 0;
 
         this.state.height.forEach((num,i)=>{
             const pos = this.getElPosition(this.state.height,i);
@@ -209,7 +276,7 @@ export default class CardsListPR extends Component {
 
             resObj.height.push(heightValue);
 
-            totalScrolled += heightValue;
+            cardsContainerHeight += heightValue;
 
             resObj.translateY.push(pos/this.screenHeight*(-10*i));
 
@@ -223,9 +290,9 @@ export default class CardsListPR extends Component {
             ...resObj
         });
 
-        this.toggleScrollOnTotalScrolled(totalScrolled,resObj.height);
+        this.toggleScrollOnTotalScrolled(cardsContainerHeight);
 
-        this.lastYPos = curYPos;
+        this.prevYPos = curYPos;
 
     };
 
@@ -235,10 +302,15 @@ export default class CardsListPR extends Component {
 
     scrollOn = false;
 
-    toggleScrollOnTotalScrolled = (totalScrolled,arrOfCardHeights)=>{
-        if (totalScrolled <= this.minCardsContainerHeight){
+    /*
+    * Переключаем scrollEnabled в зависимости от высоты контейнера карточек.
+    *
+    * @param cardsContainerHeight:number - высота контейнера с карточками
+    * */
+    toggleScrollOnTotalScrolled = (cardsContainerHeight)=>{
+        if (cardsContainerHeight <= this.minCardsContainerHeight){
             this.scrollOn = true
-        } else if(totalScrolled >= this.maxCardsContainerHeight){
+        } else if(cardsContainerHeight >= this.maxCardsContainerHeight){
             // this.scrollOn = true
         } else {
             this.scrollOn = false
@@ -258,17 +330,28 @@ export default class CardsListPR extends Component {
         y: 0
     };
     dragging = false;
-    lastYPos = 0;
+    prevYPos = 0;
 
+    /*
+    * Разрешаем начало нажатия на контейнере карточек
+    *
+    * @param e:Event - событие скролла
+    * */
     _onStartShouldSetResponder = (e)=> {
         this.dragging = true;
 
+        /*
+        * Сохраняем позицию первого прикосновения
+        * */
         this.dragStartPos = {
             x: e.nativeEvent.pageX,
             y: e.nativeEvent.pageY
         };
 
-        this.lastYPos = e.nativeEvent.pageY;
+        /*
+        * Перезыписываем значение предыдущего прикосновения
+        * */
+        this.prevYPos = e.nativeEvent.pageY;
 
         return true;
     };
@@ -279,15 +362,29 @@ export default class CardsListPR extends Component {
 
     tapedCardId = 0;
 
-    onCardPressStart = (cardId,event)=>{
+
+    /*
+    * Начало прикосновения к определенной карточке.
+    * Сохраняем дату начала прикосновения и id карточки, к которой прикоснулись.
+    *
+    * @param cardId:number - id нажатой карточки
+    * @param e:Event - событие скролла
+    * */
+    onCardPressStart = (cardId,e)=>{
         this.tapDate = new Date();
         this.tapedCardId = cardId;
     };
 
     tapTiming = 120;
 
+    /*
+    * Конец прикосновения к контейнеру.
+    *
+    * @param e:Event - событие скролла
+    * */
     handleRelease = (e)=>{
         this.dragging = false;
+        // Если прикосновение длилось меньше заданного времени, то вызываем обработчик нажатия на карточку
         if((new Date()) - this.tapDate < this.tapTiming){
             this.handleCardTap(e,this.tapedCardId);
         }
@@ -304,7 +401,7 @@ export default class CardsListPR extends Component {
                 bounces={false}
                 onScroll={this.onScroll}
                 scrollEventThrottle={16}
-                contentContainerStyle={this.getWrapperStyle()}
+                contentContainerStyle={this.getMainContainerStyle()}
             >
                 <View
                     onStartShouldSetResponder={this._onStartShouldSetResponder}
