@@ -35,20 +35,45 @@ const initialState = {
     }
 };
 
-const byId = (state=initialState,action) =>{
+const byId = (state={},action) =>{
     switch(action.type){
-        case 'REQUEST_CARD_LIST_SUCCESS':
+        case 'FETCH_CARD_LIST_SUCCESS':
             return Object.assign({},state,action.response);
         default:
             return state;
     }
 };
 
+const isFetching = (state=false,action) =>{
+    switch(action.type){
+        case 'FETCH_CARD_LIST_SUCCESS':
+            return false;
+        case 'FETCH_CARD_LIST_REQUEST':
+            return true;
+        default:
+            return state;
+    }
+};
+
+const cardsNumber = (state=0,action) =>{
+    switch(action.type){
+        case 'FETCH_CARD_LIST_SUCCESS':
+            return Object.keys(action.response).length;
+        default:
+            return state;
+    }
+};
+
 export default combineReducers({
-    byId
+    byId,
+    cardsNumber,
+    isFetching
 });
 
 export const getAllCardsAsArray = (state)=>{
     return Object.keys(state.byId).map(cardId => state.byId[cardId] );
 };
 
+export const getCardsNumber = (state)=>{
+    return state.cardsNumber;
+};

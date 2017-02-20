@@ -36,15 +36,23 @@ export default class CardsListPR extends Component {
     };
     
     shouldComponentUpdate(nextProps, nextState) {
+        // console.log(nextProps.cards !== this.props.cards || nextState.height !== this.state.height);
         return nextProps.cards !== this.props.cards || nextState.height !== this.state.height;
     }
 
     componentWillReceiveProps(nextProps){
-        if(nextProps.cards.length) {
-            this.calculateInitialValues();
+        if(nextProps.cards.length){
+            this.calculateInitialValues(nextProps.cards,nextProps.cardsNumber);
             this.handleScroll(0);
         }
     }
+
+    // componentDidUpdate(){
+        // if(this.props.cards.length){
+        //     this.calculateInitialValues();
+        //     this.handleScroll(0);
+        // }
+    // }
 
     currentOffset = 0;
     MAXIMAL_ROTATE_X_VALUE = -60;
@@ -65,9 +73,9 @@ export default class CardsListPR extends Component {
     * Подсчитываю начальные значения высоты, минимальный и максимальный размеры контейнера с кароточками
     * (для выключения и велючеия ScrollView)
     * */
-    calculateInitialValues = ()=>{
-        this.maxCardsContainerHeight = this.props.cardsNumber*this.cardWrHeight;
-        this.state.height = this.initialHeight = this.calculateInitialHeight(this.props.cards,this.cardWrHeight);
+    calculateInitialValues = (cards,cardsNumber)=>{
+        this.maxCardsContainerHeight = cardsNumber*this.cardWrHeight;
+        this.state.height = this.initialHeight = this.calculateInitialHeight(cards,this.cardWrHeight);
         this.minCardsContainerHeight = this.initialHeight.reduce((sum,num)=> sum+num);
     };
 
@@ -91,7 +99,8 @@ export default class CardsListPR extends Component {
     * Просчитываем начальное состояние карточек
     * */
     componentDidMount(){
-        this.calculateInitialValues();
+        if(!this.props.cards.length) return;
+        this.calculateInitialValues(this.props.cards,this.props.cards.length);
         this.handleScroll(0)
     }
 

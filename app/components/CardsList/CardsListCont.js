@@ -6,15 +6,22 @@ import React, {Component} from "react";
 import {connect} from "react-redux";
 import CardsListPR from "./CardsListPR";
 import {getAllCardsAsArray} from "../../reducers/index";
+import {requestCards} from "../../actions/index";
+import {getCardsNumber} from "../../reducers/index";
 
 class CardsListCont extends Component{
 
     static propTypes = {
-        cards: React.PropTypes.array.isRequired
+        cards: React.PropTypes.array.isRequired,
+        requestCards: React.PropTypes.func.isRequired
     };
 
     shouldComponentUpdate(nextProps, nextState) {
-        return nextProps.cards === this.props.cards;
+        return nextProps.cards !== this.props.cards;
+    }
+
+    componentDidMount(){
+        this.props.requestCards();
     }
 
     render(){
@@ -26,8 +33,15 @@ class CardsListCont extends Component{
 
 const mapStateToProps = (state,ownProps)=>{
     return {
-        cards: getAllCardsAsArray(state)
+        cards: getAllCardsAsArray(state),
+        cardsNumber: getCardsNumber(state)
     }
 };
 
-export default connect(mapStateToProps)(CardsListCont);
+const mapDispatchToProps = (dispatch)=>{
+    return {
+        requestCards: ()=> dispatch(requestCards())
+    }
+};
+
+export default connect(mapStateToProps,mapDispatchToProps)(CardsListCont);

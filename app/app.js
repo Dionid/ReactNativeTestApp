@@ -5,7 +5,8 @@
 import React from 'react';
 import {Provider} from "react-redux";
 import MainLayout from "./layouts/MainLayout";
-import {store} from "./reducers/index";
+import {store} from "./store/configureStore";
+
 
 export default function RocketTestApp(){
     return (
