@@ -3,6 +3,8 @@
  */
 
 import {combineReducers} from "redux";
+import {FETCH_CARD_LIST_SUCCESS} from "../../constants/actions";
+import {FETCH_CARD_LIST_REQUEST} from "../../constants/actions";
 
 const initialState = {
     0:{
@@ -46,9 +48,9 @@ const byId = (state={},action) =>{
 
 const isFetching = (state=false,action) =>{
     switch(action.type){
-        case 'FETCH_CARD_LIST_SUCCESS':
+        case FETCH_CARD_LIST_SUCCESS:
             return false;
-        case 'FETCH_CARD_LIST_REQUEST':
+        case FETCH_CARD_LIST_REQUEST:
             return true;
         default:
             return state;
@@ -57,7 +59,7 @@ const isFetching = (state=false,action) =>{
 
 const cardsNumber = (state=0,action) =>{
     switch(action.type){
-        case 'FETCH_CARD_LIST_SUCCESS':
+        case FETCH_CARD_LIST_SUCCESS:
             return Object.keys(action.response).length;
         default:
             return state;

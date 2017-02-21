@@ -3,6 +3,8 @@
  */
 
 import {combineReducers} from "redux";
+import {FETCH_HISTORY_LIST_SUCCESS} from "../../constants/actions";
+import {FETCH_HISTORY_LIST_REQUEST} from "../../constants/actions";
 
 const initialState = {
     0: {
@@ -63,7 +65,7 @@ const initialState = {
 
 const byId = (state={},action) =>{
     switch(action.type){
-        case 'FETCH_HISTORY_LIST_SUCCESS':
+        case FETCH_HISTORY_LIST_SUCCESS:
             return Object.assign({},state,action.response);
         default:
             return state;
@@ -72,9 +74,9 @@ const byId = (state={},action) =>{
 
 const isFetching = (state=false,action) =>{
     switch(action.type){
-        case 'FETCH_HISTORY_LIST_SUCCESS':
+        case FETCH_HISTORY_LIST_SUCCESS:
             return false;
-        case 'FETCH_HISTORY_LIST_REQUEST':
+        case FETCH_HISTORY_LIST_REQUEST:
             return true;
         default:
             return state;

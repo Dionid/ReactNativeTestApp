@@ -3,9 +3,10 @@
  */
 
 import axios from "axios";
+import {ROOT_API} from "../config/api";
 
 export const apiGetHistoryList = ()=>{
-    return axios.get('http://localhost:3000/historyList').then(({data})=>{
+    return axios.get(ROOT_API+'/historyList').then(({data})=>{
         return data;
     }).catch(err=>{
         console.log(err);
