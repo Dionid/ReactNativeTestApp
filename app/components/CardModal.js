@@ -24,7 +24,7 @@ const screenWidth = Dimensions.get('window').width,
 
 const AnimatedBlurView = Animated.createAnimatedComponent(BlurView);
 
-export class CardModal extends Component{
+export default class CardModal extends Component{
 
     static propTypes = {
         active: React.PropTypes.bool.isRequired,
@@ -248,5 +248,3 @@ const styles = StyleSheet.create({
         marginTop: 3
     }
 });
-
-export default CardModal;

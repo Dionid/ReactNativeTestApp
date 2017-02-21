@@ -6,12 +6,18 @@ import React, {Component} from "react";
 import {connect} from "react-redux";
 import HistoryListPr from "./HistoryListPr";
 import {getHistoryListAsArray} from "../../reducers/index";
+import {requestHistoryList} from "../../actions/index";
 
 class HistoryListCont extends Component{
 
     static propTypes = {
-        historyList: React.PropTypes.array.isRequired
+        historyList: React.PropTypes.array.isRequired,
+        requestHistoryList: React.PropTypes.func.isRequired
     };
+
+    componentDidMount(){
+        this.props.requestHistoryList();
+    }
 
     shouldComponentUpdate(nextProps, nextState) {
         return nextProps.cards === this.props.cards;
@@ -30,4 +36,10 @@ const mapStateToProps = (state,ownProps)=>{
     }
 };
 
-export default connect(mapStateToProps)(HistoryListCont);
+const mapDispatchToProps = (dispatch)=>{
+    return {
+        requestHistoryList: ()=> dispatch(requestHistoryList())
+    }
+};
+
+export default connect(mapStateToProps,mapDispatchToProps)(HistoryListCont);

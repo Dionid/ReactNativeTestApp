@@ -31,6 +31,10 @@ class MainLayout extends React.Component {
         });
     };
 
+    /*
+    * Пришлось вытащить CardModal, потому что по какой-то причине он не хочет вставать на верх экрана внутри других компонентов
+    * */
+
     render() {
         return (
             <View style={styles.container}>

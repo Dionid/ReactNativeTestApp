@@ -61,19 +61,35 @@ const initialState = {
     }
 };
 
-const byId = (state=initialState,action) =>{
+const byId = (state={},action) =>{
     switch(action.type){
-        case 'REQUEST_HISTORY_LIST_SUCCESS':
+        case 'FETCH_HISTORY_LIST_SUCCESS':
             return Object.assign({},state,action.response);
         default:
             return state;
     }
 };
 
+const isFetching = (state=false,action) =>{
+    switch(action.type){
+        case 'FETCH_HISTORY_LIST_SUCCESS':
+            return false;
+        case 'FETCH_HISTORY_LIST_REQUEST':
+            return true;
+        default:
+            return state;
+    }
+};
+
 export default combineReducers({
-    byId
+    byId,
+    isFetching
 });
 
 export const getHistoryListAsArray = (state)=>{
     return Object.keys(state.byId).map(dayId => state.byId[dayId] );
+};
+
+export const historyListIsFetching = (state)=>{
+    return state.isFetching;
 };

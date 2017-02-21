@@ -7,7 +7,7 @@ import {connect} from "react-redux";
 import CardsListPR from "./CardsListPR";
 import {getAllCardsAsArray} from "../../reducers/index";
 import {requestCards} from "../../actions/index";
-import {getCardsNumber} from "../../reducers/index";
+import {getCardsNumber,isCardsOrHistoryInLoading} from "../../reducers/index";
 
 class CardsListCont extends Component{
 
@@ -34,7 +34,8 @@ class CardsListCont extends Component{
 const mapStateToProps = (state,ownProps)=>{
     return {
         cards: getAllCardsAsArray(state),
-        cardsNumber: getCardsNumber(state)
+        cardsNumber: getCardsNumber(state),
+        loading: isCardsOrHistoryInLoading(state)
     }
 };
 

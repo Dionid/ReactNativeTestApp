@@ -23,3 +23,7 @@ export const getHistoryListAsArray = (state)=>{
 export const getCardsNumber = (state)=>{
     return cardSelectors.getCardsNumber(state.cards);
 };
+
+export const isCardsOrHistoryInLoading = (state)=>{
+    return cardSelectors.cardsIsFetching(state.cards) || historyListSelectors.historyListIsFetching(state.historyList);
+};

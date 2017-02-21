@@ -17,6 +17,7 @@ import {
     Image
 } from 'react-native';
 import HistoryListCont from "../HistoryComponent/HistoryListCont";
+import Spinner from 'react-native-loading-spinner-overlay';
 
 const screenWidth = Dimensions.get('window').width,
     screenHeight = Dimensions.get('window').height - 160;
@@ -27,12 +28,14 @@ export default class CardsListPR extends Component {
     
     static propTypes = {
         cardsNumber: React.PropTypes.number.isRequired,
-        cards: React.PropTypes.array.isRequired
+        cards: React.PropTypes.array.isRequired,
+        loading: React.PropTypes.bool.isRequired
     };
 
     static defaultProps = {
         cardsNumber: 7,
-        cards: []
+        cards: [],
+        loading: true
     };
     
     shouldComponentUpdate(nextProps, nextState) {
@@ -429,6 +432,7 @@ export default class CardsListPR extends Component {
                     }
                 </View>
                 <HistoryListCont />
+                <Spinner visible={this.props.loading} />
             </ScrollView>
         );
     }

@@ -77,3 +77,7 @@ export const getAllCardsAsArray = (state)=>{
 export const getCardsNumber = (state)=>{
     return state.cardsNumber;
 };
+
+export const cardsIsFetching = (state)=>{
+    return state.isFetching;
+};
