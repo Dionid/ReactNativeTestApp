@@ -7,6 +7,7 @@ import {connect} from "react-redux";
 import HistoryListPr from "./HistoryListPr";
 import {getHistoryListAsArray} from "../../reducers/index";
 import {requestHistoryList} from "../../actions/index";
+import {requestHistoryListAC} from "../../actions/index";
 
 class HistoryListCont extends Component{
 
@@ -20,7 +21,7 @@ class HistoryListCont extends Component{
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        return nextProps.cards === this.props.cards;
+        return nextProps.historyList !== this.props.historyList;
     }
 
     render(){
@@ -38,7 +39,7 @@ const mapStateToProps = (state,ownProps)=>{
 
 const mapDispatchToProps = (dispatch)=>{
     return {
-        requestHistoryList: ()=> dispatch(requestHistoryList())
+        requestHistoryList: ()=> dispatch(requestHistoryListAC())
     }
 };
 

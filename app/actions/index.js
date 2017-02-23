@@ -7,6 +7,8 @@ import {FETCH_CARD_LIST_REQUEST} from "../constants/actions";
 import {FETCH_CARD_LIST_SUCCESS} from "../constants/actions";
 import {FETCH_HISTORY_LIST_REQUEST} from "../constants/actions";
 import {FETCH_HISTORY_LIST_SUCCESS} from "../constants/actions";
+import {REQUEST_HISTORY_LIST} from "../constants/actions";
+
 
 export const requestCards = ()=> (dispatch)=>{
     dispatch({
@@ -25,6 +27,10 @@ export const requestCards = ()=> (dispatch)=>{
         })
     })
 };
+
+export const requestHistoryListAC = ()=>({
+    type: REQUEST_HISTORY_LIST
+});
 
 export const requestHistoryList = ()=> (dispatch)=>{
     dispatch({

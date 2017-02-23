@@ -13,6 +13,8 @@ class CardsListCont extends Component{
 
     static propTypes = {
         cards: React.PropTypes.array.isRequired,
+        cardsNumber: React.PropTypes.number.isRequired,
+        loading: React.PropTypes.bool.isRequired,
         requestCards: React.PropTypes.func.isRequired
     };
 
@@ -31,7 +33,7 @@ class CardsListCont extends Component{
     }
 }
 
-const mapStateToProps = (state,ownProps)=>{
+const mapStateToProps = (state)=>{
     return {
         cards: getAllCardsAsArray(state),
         cardsNumber: getCardsNumber(state),
