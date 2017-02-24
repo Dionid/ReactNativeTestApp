@@ -8,6 +8,7 @@ import CardsListPR from "./CardsListPR";
 import {getAllCardsAsArray} from "../../reducers/index";
 import {requestCards} from "../../actions/index";
 import {getCardsNumber,isCardsOrHistoryInLoading} from "../../reducers/index";
+import {requestCardsAC} from "../../actions/index";
 
 class CardsListCont extends Component{
 
@@ -22,7 +23,7 @@ class CardsListCont extends Component{
         return nextProps.cards !== this.props.cards;
     }
 
-    componentDidMount(){
+    componentWillMount(){
         this.props.requestCards();
     }
 
@@ -43,7 +44,7 @@ const mapStateToProps = (state)=>{
 
 const mapDispatchToProps = (dispatch)=>{
     return {
-        requestCards: ()=> dispatch(requestCards())
+        requestCards: ()=> dispatch(requestCardsAC())
     }
 };
 
