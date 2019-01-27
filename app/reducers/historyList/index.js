@@ -9,7 +9,7 @@ import {FETCH_HISTORY_LIST_REQUEST} from "../../constants/actions";
 const initialState = {
     0: {
         id:0,
-            name: 'Сегодня',
+        name: 'Сегодня',
         totalSum: 5000,
         transactions: [
             {

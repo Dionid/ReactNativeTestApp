@@ -50,13 +50,6 @@ export default class CardsListPR extends Component {
         }
     }
 
-    // componentDidUpdate(){
-        // if(this.props.cards.length){
-        //     this.calculateInitialValues();
-        //     this.handleScroll(0);
-        // }
-    // }
-
     currentOffset = 0;
     MAXIMAL_ROTATE_X_VALUE = -60;
     cardWrHeight = cardWrHeight-20;
@@ -463,13 +456,6 @@ const styles = StyleSheet.create({
         height: cardWrHeight,
         width: 320,
         borderRadius: 10,
-        // shadowOpacity: 0.8,
-        // shadowRadius: 5,
-        // shadowOffset: {
-        //     height: 10,
-        //     width: 0
-        // },
-        // shadowColor: 'rgba(0,0,0,0.3)'
     },
     cardImage: {
         width:320,
